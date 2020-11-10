@@ -1,14 +1,10 @@
-import * as bluebird from 'bluebird';
 import { program, Command } from 'commander';
 import * as _ from 'lodash';
 
-bluebird.config({
-  longStackTraces: true,
-  warnings: { wForgottenReturn: false },
+process.on('unhandledRejection', error => {
+  console.error(error);
+  logger.error(error.toString());
 });
-
-global.Promise = bluebird as any; // eslint-disable-line
-process.on('unhandledRejection', error => console.error(error));
 
 import commands from './commands';
 import * as logger from './logger';

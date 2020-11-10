@@ -60,8 +60,7 @@
     "bluebird": "^3.7.2",
     "chalk": "^4.1.0",
     "commander": "^6.2.0",
-    "config-file": "^0.3.2",
-    "fmt-obj": "^2.0.0",
+    "jsome": "^2.5.0",
     "jsonschema": "^1.4.0",
     "lodash": "^4.17.20",
     "prettycli": "^1.4.3"

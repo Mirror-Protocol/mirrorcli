@@ -1,22 +1,21 @@
 import { Mirror } from '@mirror-protocol/mirror.js';
-import { CLIKey, LCDClient } from '@terra-money/terra.js';
+import { CLIKey, LCDClient, LCDClientConfig } from '@terra-money/terra.js';
 import * as _ from 'lodash';
 
 import { config } from './config';
 
-export const getClient = (keyName: string): Mirror => {
-  const clikey = new CLIKey({
-    keyName,
+export const getLCDClient = (): LCDClient =>
+  new LCDClient({
+    chainID: config.lcd.chainId,
+    URL: config.lcd.url,
+    gasPrices: config.lcd.gasPrices,
+    gasAdjustment: config.lcd.gasAdjustment,
   });
 
+export const getMirrorClient = (keyName?: string): Mirror => {
   return new Mirror({
-    lcd: new LCDClient({
-      chainID: config.lcd.chainId,
-      URL: config.lcd.url,
-      gasPrices: config.lcd.gasPrices,
-      gasAdjustment: config.lcd.gasAdjustment,
-    }),
-    key: clikey,
+    lcd: getLCDClient(),
+    key: keyName ? new CLIKey({ keyName }) : undefined,
     collector: config.contracts.collector,
     factory: config.contracts.factory,
     gov: config.contracts.gov,
