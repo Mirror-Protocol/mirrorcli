@@ -4,9 +4,9 @@ import { config } from './config';
 
 export function parseAsset(input: string): Asset {
   const matches = input.match(/([0-9]+)(u[a-z]{3}|m[a-zA-Z]+|MIR)/);
-  if (!matches) {
+  if (matches === null) {
     throw new Error(
-      `unable to parse asset string: '${input}', must match: /([0-9]+)(u[a-z]{3}|m[a-zA-Z]+|MIR)/`
+      `unable to parse Asset from '${input}'; must be like: 123uusd (native), 123mAAPL (mAsset), 123MIR (Mirror Token)`
     );
   }
 
@@ -30,27 +30,33 @@ export function parseAsset(input: string): Asset {
     };
   } else {
     throw new Error(
-      `could not find asset: ${matches[2]} -- please register it in your config file.`
+      `could not find asset '${matches[2]}' -- please register it in your config file.`
     );
   }
 }
 
 export function parseAssetInfo(input: string): AssetInfo {
-  if (input in config.assets) {
-    return {
-      token: {
-        contract_addr: config.assets[input].token,
-      },
-    };
+  if (input.match(/^(u[a-z]{3}|m[a-zA-Z]+|MIR)$/) === null) {
+    throw new Error(
+      `unable to parse AssetInfo from '${input}'; must be native (uusd), mAsset (mAPPL), or MIR (Mirror Token)`
+    );
   }
 
-  if (input in ['uusd', 'umnt', 'usdr', 'ukrw']) {
+  if (input.startsWith('u')) {
     return {
       native_token: {
         denom: input,
       },
     };
+  } else if (input in config.assets) {
+    return {
+      token: {
+        contract_addr: config.assets[input].token,
+      },
+    };
+  } else {
+    throw new Error(
+      `could not find asset '${input}' -- please register it in your config file.`
+    );
   }
-
-  throw new Error(`could not parse AssetInfo: ${input}`);
 }
