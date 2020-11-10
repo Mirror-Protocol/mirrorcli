@@ -2,6 +2,7 @@ import * as bluebird from 'bluebird';
 import { program, Command } from 'commander';
 import * as _ from 'lodash';
 
+import { MirrorCLIConfig } from './config';
 import commands from './commands';
 
 bluebird.config({
