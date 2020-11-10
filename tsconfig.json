@@ -5,7 +5,7 @@
     "allowSyntheticDefaultImports": false,
     "experimentalDecorators": true,
     "alwaysStrict": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
     "declaration": true,
     "esModuleInterop": true,
     "lib": [
@@ -30,7 +30,7 @@
     "strict": false,
     "target": "es5",
     "paths": {
-      "*": ["src/*"]
-    }
+      "*": ["src/*"],
+    },
   }
 }

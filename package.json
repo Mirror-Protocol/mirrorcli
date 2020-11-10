@@ -11,7 +11,7 @@
     "bin"
   ],
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   },
   "scripts": {
     "build": "tsc --module commonjs",
@@ -55,7 +55,10 @@
     "typescript": "^4.0.5"
   },
   "dependencies": {
+    "@mirror-protocol/mirror.js": "^1.0.0",
+    "@terra-money/terra.js": "^0.5.13",
     "bluebird": "^3.7.2",
+    "chalk": "^4.1.0",
     "commander": "^6.2.0",
     "config-file": "^0.3.2",
     "fmt-obj": "^2.0.0",

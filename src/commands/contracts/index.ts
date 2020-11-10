@@ -5,11 +5,19 @@ import Gov from './gov';
 import Mint from './mint';
 import Oracle from './oracle';
 import Staking from './staking';
+import MirrorToken from './mirror-token';
 
 // Terraswap contracts
-import TSToken from './ts-token';
-import TSPair from './ts-pair';
-import TSFactory from './ts-factory';
+import Terraswap from './terraswap';
 
-export const mirror = [Collector, Factory, Gov, Mint, Oracle, Staking];
-export const terraswap = [TSFactory, TSPair, TSToken];
+export const mirror = [
+  Collector,
+  Factory,
+  Gov,
+  Mint,
+  Oracle,
+  Staking,
+  MirrorToken,
+];
+
+export const terraswap = [Terraswap];
