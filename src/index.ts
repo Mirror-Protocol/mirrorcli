@@ -7,11 +7,16 @@ process.on('unhandledRejection', error => {
 });
 
 import commands from './commands';
-import * as logger from './logger';
+import * as logger from './util/logger';
 
 export function run(argv: string[]): void {
   try {
-    program.name('mirrorcli').version('0.0.1');
+    program
+      .name('mirrorcli')
+      .version('0.0.1')
+      .description(
+        'Command-line interface for interacting with Mirror Protocol on Terra'
+      );
     _.each(commands, (command: Command) => {
       program.addCommand(command);
     });

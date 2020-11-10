@@ -1,8 +1,15 @@
 import { Asset, AssetInfo } from '@mirror-protocol/mirror.js';
+import { Dec } from '@terra-money/terra.js';
 
 import { config } from './config';
 
-export function parseAsset(input: string): Asset {
+export type InputParser<T> = (input: string) => T;
+
+export function parseDec(input: string): Dec {
+  return new Dec(input);
+}
+
+export function parseAsset(input: string): Asset<AssetInfo> {
   const matches = input.match(/([0-9]+)(u[a-z]{3}|m[a-zA-Z]+|MIR)/);
   if (matches === null) {
     throw new Error(

@@ -8,13 +8,16 @@ export const getLCDClient = (): LCDClient =>
   new LCDClient({
     chainID: config.lcd.chainId,
     URL: config.lcd.url,
+    // @ts-ingore
     gasPrices: config.lcd.gasPrices,
     gasAdjustment: config.lcd.gasAdjustment,
   });
 
 export const getMirrorClient = (keyName?: string): Mirror => {
   return new Mirror({
+    // @ts-ignore
     lcd: getLCDClient(),
+    // @ts-ignore
     key: keyName ? new CLIKey({ keyName }) : undefined,
     collector: config.contracts.collector,
     factory: config.contracts.factory,

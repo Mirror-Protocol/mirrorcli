@@ -7,6 +7,9 @@ import * as _ from 'lodash';
 
 import * as logger from './logger';
 
+import configSchema from '../data/configSchema';
+import DEFAULT_MIRRORCLI_CONFIG from '../data/mirrorclirc';
+
 export type DeepPartial<T> = T extends object
   ? {
       [P in keyof T]?: DeepPartial<T[P]>;
@@ -14,7 +17,7 @@ export type DeepPartial<T> = T extends object
   : T;
 
 export namespace MirrorCLIConfig {
-  export const SCHEMA = require('./configSchema.json');
+  export const SCHEMA = configSchema;
 }
 
 export interface MirrorCLIConfig {
@@ -48,8 +51,6 @@ export interface MirrorCLIConfig {
 
 export const configFilePath = path.join(homedir(), '.mirrorclirc.json');
 
-export const DEFAULT_MIRRORCLI_CONFIG: MirrorCLIConfig = require('./.mirrorclirc.default.json');
-
 export function validateConfig(
   config: DeepPartial<MirrorCLIConfig>
 ): DeepPartial<MirrorCLIConfig> {
@@ -82,7 +83,7 @@ export function loadConfig(): MirrorCLIConfig {
         fs.readFileSync(configFilePath).toString()
       );
       saveConfig(loadedConfig);
-      return _.merge(DEFAULT_MIRRORCLI_CONFIG, loadedConfig);
+      return _.merge(DEFAULT_MIRRORCLI_CONFIG, loadedConfig) as MirrorCLIConfig;
     } catch (e) {
       throw new Error(
         `Could not parse config file ${configFilePath}: ${e.message}`
