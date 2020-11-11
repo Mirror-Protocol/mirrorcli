@@ -4,21 +4,19 @@ import * as _ from 'lodash';
 
 import { config } from './config';
 
-export const getLCDClient = (): LCDClient =>
-  new LCDClient({
+export function getLCDClient(): LCDClient {
+  return new LCDClient({
     chainID: config.lcd.chainId,
     URL: config.lcd.url,
-    // @ts-ingore
     gasPrices: config.lcd.gasPrices,
     gasAdjustment: config.lcd.gasAdjustment,
   });
+}
 
-export const getMirrorClient = (keyName?: string): Mirror => {
+export function getMirrorClient(keyName?: string, home?: string): Mirror {
   return new Mirror({
-    // @ts-ignore
     lcd: getLCDClient(),
-    // @ts-ignore
-    key: keyName ? new CLIKey({ keyName }) : undefined,
+    key: keyName ? new CLIKey({ keyName, home }) : undefined,
     collector: config.contracts.collector,
     factory: config.contracts.factory,
     gov: config.contracts.gov,
@@ -35,4 +33,4 @@ export const getMirrorClient = (keyName?: string): Mirror => {
       lpToken: asset.lpToken,
     })),
   });
-};
+}

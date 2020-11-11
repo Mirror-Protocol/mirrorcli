@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 
-import { parseAsset, parseAssetInfo, parseDec } from '../../util/parse-input';
 import { createExecMenu } from '../../util/contract-menu';
 
 const exec = createExecMenu('mint', 'Mirror Mint contract functions');

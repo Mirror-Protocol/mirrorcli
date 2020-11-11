@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 export const command = new Command('exec');
 
 // short form
-command.alias('e');
+command.alias('x');
 command.description('Execute a function on a smart contract');
 
 _.each(contracts.mirror, contract => {

@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 
 import { parseAsset, parseAssetInfo, parseDec } from '../../util/parse-input';
-import { createExecMenu } from '../../util/contract-menu';
+import { createExecMenu, handleExecCommand } from '../../util/contract-menu';
 
 const exec = createExecMenu('collector', 'Mirror Collector contract functions');
 
@@ -10,8 +10,8 @@ const convert = exec
   .description(`Convert contract's balance of asset to UST or MIR`, {
     'asset-token': '(AccAddr) mAsset or MIR token',
   })
-  .action((assetToken: string) => {
-    console.log(parseAssetInfo(assetToken));
+  .action(async (assetToken: string) => {
+    handleExecCommand(exec, mirror => mirror.collector.convert(assetToken));
   });
 
 const send = exec
