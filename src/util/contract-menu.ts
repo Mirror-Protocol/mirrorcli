@@ -39,8 +39,9 @@ export function createExecMenu(
     // Fees & Gas
     .option('--fees <coins>', 'Fees to pay along with transaction')
     .option(
-      '--gas <int>',
-      'Gas limit to set per-transaction; set to "auto" or leave blank to calculate required gas automatically'
+      '--gas <int|auto>',
+      'Gas limit to set per-transaction; set to "auto" to calculate required gas automatically',
+      'auto'
     )
     .option(
       '--gas-adjustment <float>',
@@ -88,31 +89,40 @@ export async function handleExecCommand(
     sequence = accountInfo.sequence;
   }
 
-  let unsignedTx: StdSignMsg;
+  let gas: number;
+  let feeAmount: Coins;
 
-  if (exec.gas === undefined || exec.gas === 'auto') {
-    // estimate fee
-    unsignedTx = await mirror.lcd.tx.create(mirror.key.accAddress, {
-      msgs,
-      account_number: accountNumber,
-      sequence,
-      gasPrices: exec.gasPrices,
-      gasAdjustment: exec.gasAdjustment,
-      memo,
-    });
+  if (exec.gas === 'auto') {
+    // estimate gas
+    const estimatedFee = (
+      await mirror.lcd.tx.create(mirror.key.accAddress, {
+        msgs,
+        account_number: accountNumber,
+        sequence,
+        gasPrices: exec.gasPrices,
+        gasAdjustment: exec.gasAdjustment,
+        memo,
+      })
+    ).fee;
+
+    gas = estimatedFee.gas;
+
+    if (exec.fees === undefined) {
+      feeAmount = estimatedFee.amount;
+    }
   } else {
-    unsignedTx = new StdSignMsg(
-      chainId,
-      accountNumber,
-      sequence,
-      new StdFee(
-        Number.parseInt(exec.gas),
-        exec.fees !== undefined ? Coins.fromString(exec.fees) : {}
-      ),
-      msgs,
-      memo
-    );
+    gas = Number.parseInt(exec.gas);
+    feeAmount = Coins.fromString(exec.fees);
   }
+
+  const unsignedTx = new StdSignMsg(
+    chainId,
+    accountNumber,
+    sequence,
+    new StdFee(gas, feeAmount),
+    msgs,
+    memo
+  );
 
   if (exec.generateOnly) {
     jsome(unsignedTx.toStdTx().toData());
