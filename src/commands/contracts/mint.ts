@@ -9,7 +9,11 @@ const updateConfig = exec
   .command('update-config')
   .description('Update the Mirror Mint contract configuration')
   .option('--owner <string>', 'New owner')
-  .option('--token-code-id <int>', 'New Terraswap CW20 Token code ID');
+  .option('--token-code-id <int>', 'New Terraswap CW20 Token code ID')
+  .action(() => {
+    console.log(updateConfig.owner);
+  });
+
 const updateAsset = exec
   .command('update-asset <asset-token>')
   .description('Update a registered asset')
