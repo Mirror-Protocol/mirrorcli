@@ -135,6 +135,38 @@ const getConfig = query
     handleQueryCommand(query, mirror => mirror.mint.getConfig());
   });
 
+const getAssetConfig = query
+  .command('asset-config <asset-token>')
+  .description('Query Asset configuration')
+  .action((assetToken: string) => {
+    handleQueryCommand(query, mirror => mirror.mint.getAssetConfig(assetToken));
+  });
+
+const getPosition = query
+  .command('position <postition-idx>')
+  .description('Query individual CDP')
+  .action((positionIdx: string) => {
+    handleQueryCommand(query, mirror =>
+      mirror.mint.getPosition(Parse.int(positionIdx))
+    );
+  });
+
+const getPositions = query
+  .command('positions')
+  .option('--owner <string>', 'Owner address')
+  .option('--start-after <int>', 'Position index to start querying from')
+  .option('--limit <int>', 'Max number of entries returned')
+  .description('Query all CDPs')
+  .action(() => {
+    handleQueryCommand(query, mirror =>
+      mirror.mint.getPositions(
+        getPositions.owner,
+        getPositions.startAfter,
+        getPositions.limit
+      )
+    );
+  });
+
 export default {
   exec,
   query,

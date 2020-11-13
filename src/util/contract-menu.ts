@@ -155,7 +155,7 @@ export async function handleExecCommand(
 
 export async function handleQueryCommand(
   _query: commander.Command,
-  run: (mirror: Mirror) => any
+  run: (mirror: Mirror) => Promise<any>
 ) {
   // TODO: Add some query command options / validation
   const result = await run(getMirrorClient());
