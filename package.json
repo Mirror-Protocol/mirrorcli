@@ -6,6 +6,9 @@
   "typings": "dist/index.d.ts",
   "author": "Mirror Protocol",
   "license": "MIT",
+  "bin": {
+    "mirrorcli": "bin/mirrorcli"
+  },
   "files": [
     "dist",
     "bin"
@@ -59,8 +62,8 @@
     "webpack-cli": "^4.2.0"
   },
   "dependencies": {
-    "@mirror-protocol/mirror.js": "^1.0.0",
-    "@terra-money/terra.js": "^0.5.13",
+    "@mirror-protocol/mirror.js": "^1.0.4",
+    "@terra-money/terra.js": "^1.0.1",
     "bluebird": "^3.7.2",
     "chalk": "^4.1.0",
     "commander": "^6.2.0",

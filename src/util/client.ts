@@ -1,5 +1,7 @@
 import { Mirror } from '@mirror-protocol/mirror.js';
-import { CLIKey, LCDClient } from '@terra-money/terra.js';
+import { LCDClient } from '@terra-money/terra.js';
+import { CLIKey } from '@terra-money/terra.js/dist/key/CLIKey';
+
 import * as _ from 'lodash';
 
 import { config } from './config';
