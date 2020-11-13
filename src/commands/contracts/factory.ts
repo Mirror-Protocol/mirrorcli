@@ -69,12 +69,12 @@ const postInitialize = exec
 
 const whitelist = exec
   .command(
-    'whitelist <name> <symbol> <oracle-feeder> <auction-discount> <min-col-ratio>'
+    'whitelist <name> <symbol> <feeder> <auction-discount> <min-col-ratio>'
   )
   .description(`Whitelist a new mAsset`, {
     name: '(string) Name of asset to be tracked (ex. Apple Inc. stock)',
     symbol: '(string) mAsset symbol (ex. mAAPL)',
-    'oracle-feeder': '(AccAddress) Address of oracle feeder',
+    feeder: '(AccAddress) Address of oracle feeder',
     'auction-discount': '(Dec) auction discount rate of mAsset',
     'min-col-ratio': '(Dec) min. collateral ratio of mAsset',
   })
@@ -82,12 +82,12 @@ const whitelist = exec
     (
       name: string,
       symbol: string,
-      oracleFeeder: string,
+      feeder: string,
       auctionDiscount: string,
       minColRatio: string
     ) => {
       handleExecCommand(exec, mirror =>
-        mirror.factory.whitelist(name, symbol, oracleFeeder, {
+        mirror.factory.whitelist(name, symbol, feeder, {
           auction_discount: Parse.dec(auctionDiscount),
           min_collateral_ratio: Parse.dec(minColRatio),
         })

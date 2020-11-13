@@ -1,11 +1,24 @@
-import { Asset, AssetInfo } from '@mirror-protocol/mirror.js';
+import { Asset, AssetInfo, MirrorOracle } from '@mirror-protocol/mirror.js';
 import { Coins, Dec } from '@terra-money/terra.js';
+import * as _ from 'lodash';
 
 import { config } from './config';
 
 export type InputParser<T> = (input: string) => T;
 
 export namespace Parse {
+  export function prices(
+    input: string[]
+  ): { asset_token: string; price: Dec }[] {
+    return _.map(input, p => {
+      const data = p.split(':');
+      return {
+        asset_token: data[0],
+        price: Parse.dec(data[1]),
+      };
+    });
+  }
+
   export function int(input: string): number {
     return Number.parseInt(input);
   }
