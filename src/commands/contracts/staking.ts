@@ -29,7 +29,7 @@ const updateConfig = exec
   .action(() => {
     handleExecCommand(exec, mirror =>
       mirror.staking.updateConfig({
-        owner: updateConfig.owner,
+        // owner: updateConfig.owner,
       })
     );
   });

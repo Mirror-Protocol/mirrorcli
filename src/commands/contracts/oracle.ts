@@ -69,12 +69,9 @@ const getPrice = query
     'quote-asset':
       '(AccAddress | uusd): asset in which returned price should be denominated (default. uusd)',
   })
-  .action((baseAsset: string, quoteAsset: string) => {
+  .action((baseAsset: string, quoteAsset?: string) => {
     handleQueryCommand(query, mirror => {
-      if (quoteAsset === undefined) {
-        quoteAsset = 'uusd';
-      }
-      return mirror.oracle.getPrice(baseAsset, quoteAsset);
+      return mirror.oracle.getPrice(baseAsset, quoteAsset || 'uusd');
     });
   });
 
