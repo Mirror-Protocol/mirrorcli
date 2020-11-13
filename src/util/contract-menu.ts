@@ -158,6 +158,6 @@ export async function handleQueryCommand(
   run: (mirror: Mirror) => any
 ) {
   // TODO: Add some query command options / validation
-  const result = run(getMirrorClient());
+  const result = await run(getMirrorClient());
   jsome(result);
 }
