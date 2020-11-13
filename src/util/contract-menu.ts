@@ -2,6 +2,7 @@ import * as commander from 'commander';
 import * as _ from 'lodash';
 const jsome = require('jsome');
 
+import { Parse } from './parse-input';
 import { Mirror } from '@mirror-protocol/mirror.js';
 import { Msg, StdFee, StdSignMsg, Coins } from '@terra-money/terra.js';
 
@@ -22,7 +23,7 @@ export function createExecMenu(
     )
     .option(
       '-b,--broadcast-mode <string>',
-      'Transaction broadcasting mode (sync|async|block)',
+      'Transaction broadcasting mode (sync|async|block) (default: sync)',
       'sync'
     )
     // StdSignMsg
@@ -38,10 +39,9 @@ export function createExecMenu(
     .option('--memo <string>', 'Memo to send along with transaction')
     // Fees & Gas
     .option('--fees <coins>', 'Fees to pay along with transaction')
-    .option(
+    .requiredOption(
       '--gas <int|auto>',
-      'Gas limit to set per-transaction; set to "auto" to calculate required gas automatically',
-      'auto'
+      'Gas limit to set per-transaction; set to "auto" to calculate required gas automatically'
     )
     .option(
       '--gas-adjustment <float>',
@@ -80,8 +80,8 @@ export async function handleExecCommand(
         `both account-number and sequence must be provided if one is provided.`
       );
     }
-    accountNumber = Number.parseInt(exec.accountNumber);
-    sequence = Number.parseInt(exec.sequence);
+    accountNumber = Parse.int(exec.accountNumber);
+    sequence = Parse.int(exec.sequence);
   } else {
     // looks up wallet values from blockchain
     const accountInfo = await wallet.accountNumberAndSequence();
@@ -111,8 +111,13 @@ export async function handleExecCommand(
       feeAmount = estimatedFee.amount;
     }
   } else {
-    gas = Number.parseInt(exec.gas);
-    feeAmount = Coins.fromString(exec.fees);
+    if (exec.fees === undefined) {
+      feeAmount = new Coins({});
+    } else {
+      feeAmount = Parse.coins(exec.fees);
+    }
+
+    gas = Parse.int(exec.gas);
   }
 
   const unsignedTx = new StdSignMsg(
@@ -146,4 +151,13 @@ export async function handleExecCommand(
     }
     jsome(result);
   }
+}
+
+export async function handleQueryCommand(
+  _query: commander.Command,
+  run: (mirror: Mirror) => any
+) {
+  // TODO: Add some query command options / validation
+  const result = run(getMirrorClient());
+  jsome(result);
 }

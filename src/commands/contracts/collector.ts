@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 
-import { parseAsset, parseAssetInfo, parseDec } from '../../util/parse-input';
+import { Parse } from '../../util/parse-input';
 import { createExecMenu, handleExecCommand } from '../../util/contract-menu';
 
 const exec = createExecMenu('collector', 'Mirror Collector contract functions');
