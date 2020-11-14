@@ -48,15 +48,6 @@ const createPair = exec
     );
   });
 
-const send = exec
-  .command('send')
-  .description(
-    `Sends contract's balance of MIR to distribution (Mirror Gov) contract`
-  )
-  .action(() => {
-    handleExecCommand(exec, mirror => mirror.collector.send());
-  });
-
 const query = new Command('terraswap');
 query.description('Terraswap Factory contract queries');
 const getConfig = query
@@ -68,10 +59,16 @@ const getConfig = query
 
 const getPair = query
   .command('pair <asset1> <asset2>')
-  .description('Query Terraswap pair')
+  .description('Query Terraswap pair', {
+    asset1: '(AssetInfo) native coin or CW20 address',
+    asset2: '(AssetInfo) native coin or CW20 address',
+  })
   .action((asset1: string, asset2: string) => {
     handleQueryCommand(query, mirror =>
-      mirror.terraswapFactory.getPair([asset1, asset2])
+      mirror.terraswapFactory.getPair([
+        Parse.assetInfo(asset1),
+        Parse.assetInfo(asset2),
+      ])
     );
   });
 
@@ -80,7 +77,7 @@ const getPairs = query
   .description('Query all Terraswap pairs')
   .option('--start-after <asset1> <asset2>', 'pair after which to begin query')
   .option('--limit <int>', 'max results to return')
-  .action((asset1: string, asset2: string) => {
+  .action(() => {
     handleQueryCommand(query, mirror =>
       mirror.terraswapFactory.getPairs(getPairs.startAfter, getPairs.limit)
     );
