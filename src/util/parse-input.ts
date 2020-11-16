@@ -127,10 +127,8 @@ export namespace Parse {
   }
 
   export function assetInfo(input?: string): AssetInfo {
-    if (input.match(/^(u[a-z]{3}|m[a-zA-Z]+|MIR)$/) === null) {
-      throw new Error(
-        `unable to parse AssetInfo from '${input}'; must be native (uusd), mAsset (mAPPL), or MIR (Mirror Token)`
-      );
+    if (input === undefined) {
+      return undefined;
     }
 
     if (input.startsWith('u')) {
@@ -139,16 +137,12 @@ export namespace Parse {
           denom: input,
         },
       };
-    } else if (config.assets[input] !== undefined) {
+    } else {
       return {
         token: {
-          contract_addr: Parse.assetConfig(input).token,
+          contract_addr: Parse.assetTokenOrAccAddress(input),
         },
       };
-    } else {
-      throw new Error(
-        `could not find asset '${input}' -- please register it in your config file.`
-      );
     }
   }
 }

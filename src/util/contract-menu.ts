@@ -1,11 +1,18 @@
 import * as commander from 'commander';
 import * as _ from 'lodash';
 const jsome = require('jsome');
+const yesno = require('yesno');
 import * as yaml from 'yaml';
 
 import { Parse } from './parse-input';
 import { Mirror } from '@mirror-protocol/mirror.js';
-import { Msg, StdFee, StdSignMsg, Coins } from '@terra-money/terra.js';
+import {
+  Msg,
+  StdFee,
+  StdSignMsg,
+  Coins,
+  MsgExecuteContract,
+} from '@terra-money/terra.js';
 
 import { getMirrorClient } from './client';
 
@@ -17,6 +24,7 @@ export function createExecMenu(
   exec
     .description(description)
     .option('--yaml', 'Encode result as YAML instead of JSON')
+    .option('-y,--yes', 'Sign transaction without confirming (yes)')
     .option('--home <string>', 'Directory for config of terracli')
     .requiredOption('--from <string>', '*Name of key in terracli keyring')
     .option(
@@ -149,6 +157,30 @@ export async function handleExecCommand(
       jsome(unsignedTx.toStdTx().toData());
     }
   } else {
+    if (!exec.yes) {
+      let msg = unsignedTx.msgs[0].toData() as any;
+      msg.value.execute_msg = (unsignedTx
+        .msgs[0] as MsgExecuteContract).execute_msg;
+
+      console.log(
+        yaml.stringify({
+          chainId,
+          msg,
+          fee: unsignedTx.fee.toData(),
+          memo,
+        })
+      );
+
+      const ok = await yesno({
+        question: `Confirm and sign transaction with key ${exec.from}? (y/N)`,
+        defaultValue: false,
+      });
+
+      if (!ok) {
+        console.log('Process aborted.');
+        process.exit(1);
+      }
+    }
     const signedTx = await mirror.key.signTx(unsignedTx);
     let result;
     switch (exec.broadcastMode) {

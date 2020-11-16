@@ -1,4 +1,3 @@
-import { Command, parse } from 'commander';
 import * as fs from 'fs';
 
 import { Parse } from '../../util/parse-input';
@@ -13,6 +12,7 @@ import {
   TerraswapFactory,
   TerraswapPair,
   TerraswapToken,
+  AssetInfo,
 } from '@mirror-protocol/mirror.js';
 import { config } from '../../util/config';
 import { Coin } from '@terra-money/terra.js';
@@ -25,15 +25,15 @@ exec.alias('ts');
 const updateConfig = exec
   .command('update-config')
   .description(`Update Terraswap Factory contract config`)
-  .option('--owner <string>', 'New contract owner')
+  .option('--owner <AccAddress>', 'New contract owner')
   .option('--pair-code-id <int>', 'New pair code ID')
   .option('--token-code-id <int>', 'New token code ID')
   .action(() => {
     handleExecCommand(exec, mirror =>
       mirror.terraswapFactory.updateConfig({
-        owner: updateConfig.owner,
-        pair_code_id: updateConfig.pairCodeId,
-        token_code_id: updateConfig.tokenCodeId,
+        owner: Parse.accAddress(updateConfig.owner),
+        pair_code_id: Parse.int(updateConfig.pairCodeId),
+        token_code_id: Parse.int(updateConfig.tokenCodeId),
       })
     );
   });
@@ -103,9 +103,9 @@ const swap = exec
       const pair = lookupPair(mirror, offer.denom, toAssetInfo);
 
       return pair.swap(Parse.asset(fromAsset), {
-        belief_price: swap.beliefPrice,
-        max_spread: swap.maxSpread,
-        to: swap.sendTo,
+        belief_price: Parse.dec(swap.beliefPrice),
+        max_spread: Parse.dec(swap.maxSpread),
+        to: Parse.accAddress(swap.sendTo),
       });
     });
   });
@@ -156,8 +156,8 @@ const getConfig = query
 const getPair = query
   .command('pair <asset1> <asset2>')
   .description('Query Terraswap pair', {
-    asset1: '(AssetInfo) native coin or CW20 address',
-    asset2: '(AssetInfo) native coin or CW20 address',
+    asset1: '(symbol / AccAddress / uusd) native coin or CW20 address',
+    asset2: '(symbol / AccAddress / uusd) native coin or CW20 address',
   })
   .action((asset1: string, asset2: string) => {
     handleQueryCommand(query, mirror =>
@@ -171,12 +171,23 @@ const getPair = query
 const getPairs = query
   .command('pairs')
   .description('Query all Terraswap pairs')
-  .option('--start-after <asset1> <asset2>', 'pair after which to begin query')
+  .option(
+    '--start-after <pair>',
+    'pair after which to begin query. e.g. MIR/uusd'
+  )
   .option('--limit <int>', 'max results to return')
   .action(() => {
-    handleQueryCommand(query, mirror =>
-      mirror.terraswapFactory.getPairs(getPairs.startAfter, getPairs.limit)
-    );
+    handleQueryCommand(query, mirror => {
+      let startAfter: [AssetInfo, AssetInfo];
+      if (getPairs.startAfter !== undefined) {
+        const c = getPairs.startAfter.split('/');
+        startAfter = [Parse.assetInfo(c[0]), Parse.assetInfo(c[1])];
+      }
+      return mirror.terraswapFactory.getPairs(
+        startAfter,
+        Parse.int(getPairs.limit)
+      );
+    });
   });
 
 const getSimulateSwap = query
