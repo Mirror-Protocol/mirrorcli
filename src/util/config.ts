@@ -1,6 +1,7 @@
 import { homedir } from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
+import { AccAddress, Coins, Numeric } from '@terra-money/terra.js';
 
 import { Validator } from 'jsonschema';
 import * as _ from 'lodash';
@@ -20,32 +21,37 @@ export namespace MirrorCLIConfig {
   export const SCHEMA = configSchema;
 }
 
-export interface MirrorCLIConfig {
+export interface MirrorCLINetworkConfig {
   lcd: {
     chainId: string;
     url: string;
-    gasPrices?: {
-      [denom: string]: number;
-    };
-    gasAdjustment?: number;
+    gasPrices?: Coins.Input;
+    gasAdjustment?: Numeric.Input;
   };
+
   contracts: {
-    collector: string;
-    factory: string;
-    gov: string;
-    mint: string;
-    oracle: string;
-    staking: string;
-    'mirror-token': string;
-    terraswap: string;
+    collector: AccAddress;
+    factory: AccAddress;
+    gov: AccAddress;
+    mint: AccAddress;
+    oracle: AccAddress;
+    staking: AccAddress;
+    'mirror-token': AccAddress;
+    terraswap: AccAddress;
   };
   assets: {
     [symbol: string]: {
       name: string;
-      token: string;
-      pair: string;
-      lpToken: string;
+      token: AccAddress;
+      pair: AccAddress;
+      lpToken: AccAddress;
     };
+  };
+}
+
+export interface MirrorCLIConfig {
+  networks: {
+    [networkName: string]: MirrorCLINetworkConfig;
   };
 }
 
@@ -55,7 +61,7 @@ export function validateConfig(
   config: DeepPartial<MirrorCLIConfig>
 ): DeepPartial<MirrorCLIConfig> {
   const v = new Validator();
-  const r = v.validate(config, MirrorCLIConfig.SCHEMA, {});
+  const r = v.validate(config, MirrorCLIConfig.SCHEMA);
   if (r.valid) {
     return config;
   } else {
@@ -75,7 +81,7 @@ export function saveConfig(config: DeepPartial<MirrorCLIConfig>) {
 
 export function loadConfig(): MirrorCLIConfig {
   if (!fs.existsSync(configFilePath)) {
-    saveConfig({});
+    saveConfig(DEFAULT_MIRRORCLI_CONFIG);
     return DEFAULT_MIRRORCLI_CONFIG;
   } else {
     try {
@@ -83,7 +89,10 @@ export function loadConfig(): MirrorCLIConfig {
         fs.readFileSync(configFilePath).toString()
       );
       saveConfig(loadedConfig);
-      return _.merge(DEFAULT_MIRRORCLI_CONFIG, loadedConfig) as MirrorCLIConfig;
+      return {
+        ...DEFAULT_MIRRORCLI_CONFIG,
+        ...loadedConfig,
+      } as MirrorCLIConfig;
     } catch (e) {
       throw new Error(
         `Could not parse config file ${configFilePath}: ${e.message}`
@@ -92,9 +101,17 @@ export function loadConfig(): MirrorCLIConfig {
   }
 }
 
+export const activeNetwork = process.env.MIRRORCLI_NETWORK || 'columbus-4';
+
 export const config = (() => {
   try {
-    return loadConfig();
+    const c = loadConfig().networks[activeNetwork];
+    if (c === undefined) {
+      throw new Error(
+        `Could not find configuration for MIRRORCLI_NETWORK=${activeNetwork}`
+      );
+    }
+    return c;
   } catch (e) {
     logger.error(e.message);
     process.exit();

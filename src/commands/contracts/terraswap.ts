@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, parse } from 'commander';
 import * as fs from 'fs';
 
 import { Parse } from '../../util/parse-input';
@@ -7,12 +7,19 @@ import {
   handleExecCommand,
   handleQueryCommand,
 } from '../../util/contract-menu';
-import { TerraswapFactory } from '@mirror-protocol/mirror.js';
+import {
+  Mirror,
+  TerraswapFactory,
+  TerraswapPair,
+  TerraswapToken,
+} from '@mirror-protocol/mirror.js';
+import { config } from '../../util/config';
+import { Coin } from '@terra-money/terra.js';
 
-const exec = createExecMenu(
-  'terraswap',
-  'Terraswap Factory contract functions'
-);
+const exec = createExecMenu('terraswap', 'Terraswap contract functions');
+exec.alias('ts');
+
+// factory
 
 const updateConfig = exec
   .command('update-config')
@@ -48,8 +55,97 @@ const createPair = exec
     );
   });
 
+// pair
+
+export function lookupPair(
+  mirror: Mirror,
+  fromAsset: string,
+  toAsset: string
+): TerraswapPair {
+  let contractAddress;
+
+  if (fromAsset !== 'uusd' && toAsset !== 'uusd') {
+    throw new Error('at least FROM or TO must be uusd');
+  }
+
+  if (fromAsset === 'uusd') {
+    contractAddress = config.assets[toAsset].pair;
+  } else {
+    contractAddress = config.assets[fromAsset].pair;
+  }
+
+  return new TerraswapPair({
+    contractAddress,
+    lcd: mirror.lcd,
+    key: mirror.key,
+  });
+}
+
+const swap = exec
+  .command('swap <from-asset> <to-asset-info>')
+  .description(`Swap one asset for another using Terraswap`, {
+    'from-asset': '(Asset) asset to swap from, e.g. 1000uusd, 1000mAAPL',
+    'to-asset-info': '(AssetInfo) asset to swap into, e.g. uusd, MIR',
+  })
+  .option(
+    '--belief-price <Dec>',
+    'Base used for calculating max spread using --max-spread option'
+  )
+  .option(
+    '--max-spread <Dec>',
+    'Max % spread for transaction (if exceeded, tx will fail)'
+  )
+  .option('--send-to <string>', 'Account to send swapped funds to')
+  .action((fromAsset: string, toAssetInfo: string) => {
+    handleExecCommand(exec, mirror => {
+      const offer = Coin.fromString(fromAsset);
+      const pair = lookupPair(mirror, offer.denom, toAssetInfo);
+
+      return pair.swap(Parse.asset(fromAsset), {
+        belief_price: swap.beliefPrice,
+        max_spread: swap.maxSpread,
+        to: swap.sendTo,
+      });
+    });
+  });
+
+const provideLiquidity = exec
+  .command('provide-liquidity <asset1> <asset2>')
+  .description(`Provide liquidity to a Terraswap pool`, {
+    asset1: '(Asset) first side of liquidity pool e.g. 1000mAAPL',
+    asset2: '(Asset) second side of liquidity pool e.g. 1000uusd',
+  })
+  .action((asset1: string, asset2: string) => {
+    handleExecCommand(exec, mirror => {
+      let denom1 = Coin.fromString(asset1).denom;
+      let denom2 = Coin.fromString(asset2).denom;
+      const pair = lookupPair(mirror, denom1, denom2);
+      return pair.provideLiquidity([Parse.asset(asset1), Parse.asset(asset2)]);
+    });
+  });
+
+const withdrawLiquidity = exec
+  .command('withdraw-liquidity <asset-info> <amount>')
+  .description(`Withdraw liquidity from a Terraswap pool`, {
+    'asset-info':
+      '(AssetInfo) liquidity pool from which to withdraw from e.g. mAAPL',
+    amount: '(Uint128) amount of LP tokens to burn',
+  })
+  .action((assetInfo: string, amount: string) => {
+    handleExecCommand(exec, mirror => {
+      const pair = lookupPair(mirror, assetInfo, 'uusd');
+      const lpToken = new TerraswapToken({
+        contractAddress: config.assets[assetInfo].lpToken,
+        lcd: mirror.lcd,
+        key: mirror.key,
+      });
+      return pair.withdrawLiquidity(Parse.int(amount), lpToken);
+    });
+  });
+
 const query = new Command('terraswap');
-query.description('Terraswap Factory contract queries');
+query.alias('ts');
+query.description('Terraswap contract queries');
 const getConfig = query
   .command('config')
   .description('Query Terraswap Factory contract config')
@@ -81,6 +177,28 @@ const getPairs = query
     handleQueryCommand(query, mirror =>
       mirror.terraswapFactory.getPairs(getPairs.startAfter, getPairs.limit)
     );
+  });
+
+const simulateSwap = query
+  .command('simulate-swap <from-asset> <to-asset>')
+  .description('Simulate and determine swap price', {
+    'from-asset':
+      '(Asset / AssetInfo) asset to swap from, e.g. 1000uusd, 1000mAAPL',
+    'to-asset': '(Asset / AssetInfo) asset to swap into, e.g. uusd, MIR',
+  })
+  .option('--reverse', 'Reverse simulation (calculate from-asset)')
+  .action((fromAsset: string, toAsset: string) => {
+    handleQueryCommand(query, mirror => {
+      if (simulateSwap.reverse) {
+        const askDenom = Coin.fromString(toAsset).denom;
+        const pair = lookupPair(mirror, fromAsset, askDenom);
+        return pair.getReverseSimulation(Parse.asset(toAsset));
+      } else {
+        const offerDenom = Coin.fromString(fromAsset).denom;
+        const pair = lookupPair(mirror, offerDenom, toAsset);
+        return pair.getSimulation(Parse.asset(fromAsset));
+      }
+    });
   });
 
 export default {
