@@ -4,10 +4,14 @@ import * as _ from 'lodash';
 
 import { config, AssetConfig, activeNetwork, configFilePath } from './config';
 
-export type InputParser<T> = (input: string) => T;
+export type InputParser<T> = (input?: string) => T;
 
 export namespace Parse {
   export function assetTokenOrAccAddress(input?: string): AccAddress {
+    if (input === undefined) {
+      return undefined;
+    }
+
     if (AccAddress.validate(input)) {
       return input;
     } else {
@@ -16,8 +20,8 @@ export namespace Parse {
   }
 
   export function accAddress(input?: string): AccAddress {
-    if (input === undefined) {
-      return undefined;
+    {
+      if (input === undefined) return undefined;
     }
 
     if (!AccAddress.validate(input)) {
@@ -27,7 +31,11 @@ export namespace Parse {
     return input;
   }
 
-  export function assetConfig(input: string): AssetConfig {
+  export function assetConfig(input?: string): AssetConfig {
+    if (input === undefined) {
+      return undefined;
+    }
+
     if (config.assets[input] === undefined) {
       throw new Error(
         `Asset '${input}' not found in registry; please add info to networks[${activeNetwork}][assets][${input}] in ${configFilePath}`
@@ -38,8 +46,12 @@ export namespace Parse {
   }
 
   export function prices(
-    input: string[]
+    input?: string[]
   ): { asset_token: string; price: Dec }[] {
+    if (input === undefined) {
+      return undefined;
+    }
+
     return _.map(input, p => {
       const data = p.split(':');
       return {
@@ -77,7 +89,11 @@ export namespace Parse {
     return new Dec(input);
   }
 
-  export function asset(input: string): Asset<AssetInfo> {
+  export function asset(input?: string): Asset<AssetInfo> {
+    if (input === undefined) {
+      return undefined;
+    }
+
     const matches = input.match(/([0-9]+)(u[a-z]{3}|m[a-zA-Z]+|MIR)/);
     if (matches === null) {
       throw new Error(
@@ -110,7 +126,7 @@ export namespace Parse {
     }
   }
 
-  export function assetInfo(input: string): AssetInfo {
+  export function assetInfo(input?: string): AssetInfo {
     if (input.match(/^(u[a-z]{3}|m[a-zA-Z]+|MIR)$/) === null) {
       throw new Error(
         `unable to parse AssetInfo from '${input}'; must be native (uusd), mAsset (mAPPL), or MIR (Mirror Token)`

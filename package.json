@@ -45,6 +45,7 @@
   "devDependencies": {
     "@types/bluebird": "^3.5.33",
     "@types/lodash": "^4.14.165",
+    "@types/yaml": "^1.9.7",
     "@typescript-eslint/eslint-plugin": "^4.7.0",
     "@typescript-eslint/parser": "^4.7.0",
     "eslint": "^7.13.0",
@@ -70,6 +71,7 @@
     "jsome": "^2.5.0",
     "jsonschema": "^1.4.0",
     "lodash": "^4.17.20",
-    "prettycli": "^1.4.3"
+    "prettycli": "^1.4.3",
+    "yaml": "^1.10.0"
   }
 }

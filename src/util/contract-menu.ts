@@ -1,6 +1,7 @@
 import * as commander from 'commander';
 import * as _ from 'lodash';
 const jsome = require('jsome');
+import * as yaml from 'yaml';
 
 import { Parse } from './parse-input';
 import { Mirror } from '@mirror-protocol/mirror.js';
@@ -15,6 +16,7 @@ export function createExecMenu(
   const exec = new commander.Command(name);
   exec
     .description(description)
+    .option('--yaml', 'Encode result as YAML instead of JSON')
     .option('--home <string>', 'Directory for config of terracli')
     .requiredOption('--from <string>', 'Name of key in terracli keyring')
     .option(
@@ -53,6 +55,17 @@ export function createExecMenu(
     );
 
   return exec;
+}
+
+export function createQueryMenu(
+  name: string,
+  description: string
+): commander.Command {
+  const query = new commander.Command(name);
+  query
+    .description(description)
+    .option('--yaml', 'Encode result as YAML instead of JSON');
+  return query;
 }
 
 export async function handleExecCommand(
@@ -130,7 +143,11 @@ export async function handleExecCommand(
   );
 
   if (exec.generateOnly) {
-    jsome(unsignedTx.toStdTx().toData());
+    if (exec.yaml) {
+      console.log(yaml.stringify(unsignedTx.toStdTx().toData()));
+    } else {
+      jsome(unsignedTx.toStdTx().toData());
+    }
   } else {
     const signedTx = await mirror.key.signTx(unsignedTx);
     let result;
@@ -149,15 +166,22 @@ export async function handleExecCommand(
           `invalid broadcast-mode '${exec.broadcastMode}' - must be sync|async|block`
         );
     }
-    jsome(result);
+    if (exec.yaml) {
+      console.log(yaml.stringify(result));
+    } else {
+      jsome(result);
+    }
   }
 }
 
 export async function handleQueryCommand(
-  _query: commander.Command,
+  query: commander.Command,
   run: (mirror: Mirror) => Promise<any>
 ) {
-  // TODO: Add some query command options / validation
   const result = await run(getMirrorClient());
-  jsome(result);
+  if (query.yaml) {
+    console.log(yaml.stringify(result));
+  } else {
+    jsome(result);
+  }
 }

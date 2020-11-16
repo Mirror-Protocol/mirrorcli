@@ -1,8 +1,6 @@
-import { Command } from 'commander';
-
-import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
+  createQueryMenu,
   handleExecCommand,
   handleQueryCommand,
 } from '../../util/contract-menu';
@@ -27,8 +25,7 @@ const send = exec
     handleExecCommand(exec, mirror => mirror.collector.send());
   });
 
-const query = new Command('collector');
-query.description('Mirror Collector contract queries');
+const query = createQueryMenu('collector', 'Mirror Collector contract queries');
 const getConfig = query
   .command('config')
   .description('Query Mirror Collector contract config')

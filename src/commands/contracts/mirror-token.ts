@@ -1,8 +1,7 @@
-import { Command } from 'commander';
-
 import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
+  createQueryMenu,
   handleExecCommand,
   handleQueryCommand,
 } from '../../util/contract-menu';
@@ -17,7 +16,7 @@ const burn = exec
   })
   .action((amount: string) => {
     handleExecCommand(exec, mirror =>
-      mirror.mirrorToken.burn(Parse.int(amount))
+      mirror.mirrorToken.burn(Parse.uint128(amount))
     );
   });
 
@@ -29,25 +28,48 @@ const burnFrom = exec
   })
   .action((owner: string, amount: string) => {
     handleExecCommand(exec, mirror =>
-      mirror.mirrorToken.burnFrom(owner, amount)
+      mirror.mirrorToken.burnFrom(
+        Parse.accAddress(owner),
+        Parse.uint128(amount)
+      )
     );
   });
 
 const increaseAllowance = exec
   .command('increase-allowance <spender> <amount>')
   .description(`Burns MIR token`, {
-    owner: '(AccAddress) account to burn from',
-    amount: '(Uint128) amount to burn',
+    spender: '(AccAddress) spender',
+    amount: '(Uint128) amount to increase allowance by',
   })
   .option('--expiry-height <int>', 'block height expiration of allowance')
   .option('--expiry-time <int>', 'time expiration of allowance (seconds)')
   .action((spender: string, amount: string) => {
     handleExecCommand(exec, mirror =>
-      mirror.mirrorToken.increaseAllowance(spender, Parse.int(amount))
+      mirror.mirrorToken.increaseAllowance(
+        Parse.accAddress(spender),
+        Parse.uint128(amount)
+      )
     );
   });
 
-const query = new Command('mirror-token');
+const decreaseAllowance = exec
+  .command('decrease-allowance <spender> <amount>')
+  .description(`Burns MIR token`, {
+    spender: '(AccAddress) spender',
+    amount: '(Uint128) amount to decrease allowance by',
+  })
+  .option('--expiry-height <int>', 'block height expiration of allowance')
+  .option('--expiry-time <int>', 'time expiration of allowance (seconds)')
+  .action((spender: string, amount: string) => {
+    handleExecCommand(exec, mirror =>
+      mirror.mirrorToken.decreaseAllowance(
+        Parse.accAddress(spender),
+        Parse.uint128(amount)
+      )
+    );
+  });
+
+const query = createQueryMenu('mirror-token', 'Mirror Token contract queries');
 query.alias('MIR');
 query.description('Mirror Token contract queries');
 const getTokenInfo = query

@@ -1,8 +1,7 @@
-import { Command } from 'commander';
-
 import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
+  createQueryMenu,
   handleExecCommand,
   handleQueryCommand,
 } from '../../util/contract-menu';
@@ -13,12 +12,15 @@ const exec = createExecMenu('staking', 'Mirror Staking contract functions');
 const registerAsset = exec
   .command('register-asset <asset-token> <staking-token>')
   .description('Register asset with Mirror Staking contract', {
-    'asset-token': '(AccAddress) mAsset or MIR token',
+    'asset-token': '(symbol / AccAddress) mAsset or MIR token',
     'staking-token': '(AccAddress) Associated LP token',
   })
   .action((assetToken: string, stakingToken: string) => {
     handleExecCommand(exec, mirror =>
-      mirror.staking.registerAsset(assetToken, stakingToken)
+      mirror.staking.registerAsset(
+        Parse.assetTokenOrAccAddress(assetToken),
+        Parse.accAddress(stakingToken)
+      )
     );
   });
 
@@ -35,37 +37,58 @@ const updateConfig = exec
   });
 
 const bond = exec
-  .command('bond <asset-token> <amount>')
+  .command('bond <asset-token> <amount> [lp-token]')
   .description('Stakes LP token for asset', {
-    'asset-token': '(AccAddress) mAsset or MIR token',
+    'asset-token': '(symbol) mAsset or MIR token',
     amount: '(Uint128) amount of LP token to bond',
+    'lp-token': '(AccAddress) LP Token address',
   })
-  .action((assetToken: string, amount: string) => {
-    handleExecCommand(exec, mirror =>
-      mirror.staking.bond(assetToken, amount, new TerraswapToken({}))
-    );
+  .action((assetToken: string, amount: string, lpToken?: string) => {
+    handleExecCommand(exec, mirror => {
+      let lpTokenInstance;
+      if (lpToken !== undefined) {
+        lpTokenInstance = new TerraswapToken({
+          contractAddress: Parse.accAddress(lpToken),
+          lcd: mirror.lcd,
+          key: mirror.key,
+        });
+      } else {
+        lpTokenInstance = new TerraswapToken({
+          contractAddress: Parse.assetConfig(assetToken).lpToken,
+          lcd: mirror.lcd,
+          key: mirror.key,
+        });
+      }
+      return mirror.staking.bond(
+        Parse.assetTokenOrAccAddress(assetToken),
+        Parse.uint128(amount),
+        lpTokenInstance
+      );
+    });
   });
 
 const withdraw = exec
   .command('withdraw <asset-token>')
   .description('Withdraw asset from Mirror Staking contract', {
-    'asset-token': '(AccAddress) mAsset or MIR token',
+    'asset-token': '(symbol / AccAddress) mAsset or MIR token',
   })
   .action((assetToken: string) => {
-    handleExecCommand(exec, mirror => mirror.staking.withdraw(assetToken));
+    handleExecCommand(exec, mirror =>
+      mirror.staking.withdraw(Parse.assetTokenOrAccAddress(assetToken))
+    );
   });
 
 const depositReward = exec
   .command('deposit-reward <asset-token>')
   .description(`Adds MIR tokens to the rewards for the asset's staking pool`, {
-    'asset-token': '(AccAddress) address of staking pool to reward',
+    'asset-token': '(symbol / AccAddress) address of staking pool to reward',
     amount: '(Uint128) amount of MIR token to deposit',
   })
   .action((assetToken: string, amount: string) => {
     handleExecCommand(exec, mirror => {
       return mirror.staking.depositReward(
-        assetToken,
-        amount,
+        Parse.assetTokenOrAccAddress(assetToken),
+        Parse.uint128(amount),
         mirror.mirrorToken
       );
     });
@@ -74,17 +97,16 @@ const depositReward = exec
 const unbond = exec
   .command('unbond <asset-token> <amount>')
   .description(`Unstakes LP tokens from staking pool`, {
-    'asset-token': '(AccAddress) mAsset or MIR token',
+    'asset-token': '(symbol / AccAddress) mAsset or MIR token',
     amount: '(Uint128) amount of LP tokens to unbond',
   })
   .action((assetToken: string, amount: string) => {
     handleExecCommand(exec, mirror =>
-      mirror.staking.unbond(assetToken, amount)
+      mirror.staking.unbond(Parse.assetTokenOrAccAddress(assetToken), amount)
     );
   });
 
-const query = new Command('staking');
-query.description('Mirror staking contract queries');
+const query = createQueryMenu('staking', 'Mirror Staking contract queries');
 const getConfig = query
   .command('config')
   .description('Query Mirror Staking contract config')
@@ -95,10 +117,12 @@ const getConfig = query
 const getPoolInfo = query
   .command('pool-info <asset-token>')
   .description('Query Mirror Staking pool info', {
-    'asset-token': '(AccAddress) mAsset or MIR token',
+    'asset-token': '(symbol / AccAddress) mAsset or MIR token',
   })
   .action((assetToken: string) => {
-    handleQueryCommand(query, mirror => mirror.staking.getPoolInfo(assetToken));
+    handleQueryCommand(query, mirror =>
+      mirror.staking.getPoolInfo(Parse.assetTokenOrAccAddress(assetToken))
+    );
   });
 
 const getRewardInfo = query
@@ -106,11 +130,14 @@ const getRewardInfo = query
   .description('Query reward info for staker', {
     staker: '(AccAddress) staker for whom to query rewards',
     'asset-token':
-      '(AccAddress) mAsset or MIR token. If empty, returns all rewards.',
+      '(symbol / AccAddress) mAsset or MIR token. If empty, returns all rewards.',
   })
   .action((staker: string, assetToken?: string) => {
     handleQueryCommand(query, mirror =>
-      mirror.staking.getRewardInfo(staker, assetToken)
+      mirror.staking.getRewardInfo(
+        staker,
+        Parse.assetTokenOrAccAddress(assetToken)
+      )
     );
   });
 

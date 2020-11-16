@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
+  createQueryMenu,
   handleExecCommand,
   handleQueryCommand,
 } from '../../util/contract-menu';
@@ -139,13 +140,12 @@ const withdrawLiquidity = exec
         lcd: mirror.lcd,
         key: mirror.key,
       });
-      return pair.withdrawLiquidity(Parse.int(amount), lpToken);
+      return pair.withdrawLiquidity(Parse.uint128(amount), lpToken);
     });
   });
 
-const query = new Command('terraswap');
+const query = createQueryMenu('terraswap', 'Terraswap contract queries');
 query.alias('ts');
-query.description('Terraswap contract queries');
 const getConfig = query
   .command('config')
   .description('Query Terraswap Factory contract config')
@@ -179,7 +179,7 @@ const getPairs = query
     );
   });
 
-const simulateSwap = query
+const getSimulateSwap = query
   .command('simulate-swap <from-asset> <to-asset>')
   .description('Simulate and determine swap price', {
     'from-asset':
@@ -189,7 +189,7 @@ const simulateSwap = query
   .option('--reverse', 'Reverse simulation (calculate from-asset)')
   .action((fromAsset: string, toAsset: string) => {
     handleQueryCommand(query, mirror => {
-      if (simulateSwap.reverse) {
+      if (getSimulateSwap.reverse) {
         const askDenom = Coin.fromString(toAsset).denom;
         const pair = lookupPair(mirror, fromAsset, askDenom);
         return pair.getReverseSimulation(Parse.asset(toAsset));

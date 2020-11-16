@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
+  createQueryMenu,
   handleExecCommand,
   handleQueryCommand,
 } from '../../util/contract-menu';
@@ -143,8 +144,7 @@ const passCommand = exec
     });
   });
 
-const query = new Command('factory');
-query.description('Mirror Factory contract queries');
+const query = createQueryMenu('factory', 'Mirror Factory contract queries');
 const getConfig = query
   .command('config')
   .description('Query Mirror Factory contract config')

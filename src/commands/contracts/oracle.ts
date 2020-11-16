@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
+  createQueryMenu,
   handleExecCommand,
   handleQueryCommand,
 } from '../../util/contract-menu';
@@ -47,8 +48,7 @@ const feedPrice = exec
     handleExecCommand(exec, mirror => mirror.oracle.feedPrice(prices));
   });
 
-const query = new Command('oracle');
-query.description('Mirror Oracle contract queries');
+const query = createQueryMenu('oracle', 'Mirror Oracle contract queries');
 const getConfig = query
   .command('config')
   .description('Query Mirror Oracle contract config')
