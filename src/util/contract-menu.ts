@@ -18,7 +18,7 @@ export function createExecMenu(
     .description(description)
     .option('--yaml', 'Encode result as YAML instead of JSON')
     .option('--home <string>', 'Directory for config of terracli')
-    .requiredOption('--from <string>', 'Name of key in terracli keyring')
+    .requiredOption('--from <string>', '*Name of key in terracli keyring')
     .option(
       '--generate-only',
       'Build an unsigned transaction and write it to stdout'
@@ -43,7 +43,7 @@ export function createExecMenu(
     .option('--fees <coins>', 'Fees to pay along with transaction')
     .requiredOption(
       '--gas <int|auto>',
-      'Gas limit to set per-transaction; set to "auto" to calculate required gas automatically'
+      '*Gas limit to set per-transaction; set to "auto" to calculate required gas automatically'
     )
     .option(
       '--gas-adjustment <float>',

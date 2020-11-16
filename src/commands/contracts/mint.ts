@@ -43,9 +43,9 @@ const updateAsset = exec
 
 const registerAsset = exec
   .command('register-asset')
-  .requiredOption('--asset <symbol/AccAddress>', 'Address of mAsset token')
-  .requiredOption('--auction-discount <Dec>', 'Auction discount rate')
-  .requiredOption('--min-col-ratio <Dec>', 'Min. collateral ratio')
+  .requiredOption('--asset <symbol/AccAddress>', '*Address of mAsset token')
+  .requiredOption('--auction-discount <Dec>', '*Auction discount rate')
+  .requiredOption('--min-col-ratio <Dec>', '*Min. collateral ratio')
   .description('Register a new asset')
   .action(() => {
     handleExecCommand(exec, mirror =>
@@ -66,13 +66,13 @@ const openPosition = exec
   .description('Open a new collateralized debt position (CDP)')
   .requiredOption(
     '--collateral <Asset>',
-    'Initial collateral to deposit, e.g. 100000uusd'
+    '*Initial collateral to deposit, e.g. 100000uusd'
   )
   .requiredOption(
     '--asset <symbol / AccAddress>',
-    'Asset to be minted by CDP, e.g. mAAPL'
+    '*Asset to be minted by CDP, e.g. mAAPL'
   )
-  .requiredOption('--col-ratio <Dec>', 'initial collateral ratio to use')
+  .requiredOption('--col-ratio <Dec>', '*initial collateral ratio to use')
   .action(() => {
     handleExecCommand(exec, mirror =>
       mirror.mint.openPosition(

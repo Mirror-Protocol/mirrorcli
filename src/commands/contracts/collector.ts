@@ -1,3 +1,4 @@
+import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
   createQueryMenu,
@@ -10,10 +11,12 @@ const exec = createExecMenu('collector', 'Mirror Collector contract functions');
 const convert = exec
   .command('convert <asset-token>')
   .description(`Convert contract's balance of asset to UST or MIR`, {
-    'asset-token': '(AccAddress) mAsset or MIR token',
+    'asset-token': '(symbol / AccAddress) mAsset or MIR token',
   })
   .action((assetToken: string) => {
-    handleExecCommand(exec, mirror => mirror.collector.convert(assetToken));
+    handleExecCommand(exec, mirror =>
+      mirror.collector.convert(Parse.assetTokenOrAccAddress(assetToken))
+    );
   });
 
 const send = exec

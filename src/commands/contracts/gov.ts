@@ -33,9 +33,9 @@ const castVote = exec
 const createPoll = exec
   .command('create-poll')
   .description(`Create a new poll`)
-  .requiredOption('--title <string>', 'Title of poll')
-  .requiredOption('--desc <string>', 'Poll description')
-  .requiredOption('--deposit <Uint128>', 'deposit amount of MIR tokens')
+  .requiredOption('--title <string>', '*Title of poll')
+  .requiredOption('--desc <string>', '*Poll description')
+  .requiredOption('--deposit <Uint128>', '*deposit amount of MIR tokens')
   .option('--link <url>', 'URL with more information')
   .option('--execute-msg <path>', 'File containing ExecuteMsg')
   .action(() => {
