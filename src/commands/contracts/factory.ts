@@ -111,13 +111,18 @@ const migrateAsset = exec
   .description(`Migrate an mAsset`, {
     name: '(string) name of asset to track',
     symbol: '(string) name of mAsset symbol',
-    'from-token': '(AccAddress) token address',
+    'from-token': '(symbol) token address',
     'end-price': '(Dec) end price',
   })
   .action(
     (name: string, symbol: string, fromToken: string, endPrice: string) => {
       handleExecCommand(exec, mirror =>
-        mirror.factory.migrateAsset(name, symbol, fromToken, endPrice)
+        mirror.factory.migrateAsset(
+          name,
+          symbol,
+          Parse.assetConfig(fromToken).token,
+          Parse.dec(endPrice)
+        )
       );
     }
   );
@@ -131,7 +136,10 @@ const passCommand = exec
   .action((contractAddress: string, msg: string) => {
     handleExecCommand(exec, mirror => {
       const fileData = fs.readFileSync(msg).toString();
-      return mirror.factory.passCommand(contractAddress, JSON.parse(fileData));
+      return mirror.factory.passCommand(
+        Parse.accAddress(contractAddress),
+        JSON.parse(fileData)
+      );
     });
   });
 

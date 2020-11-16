@@ -1,32 +1,79 @@
-import { Asset, AssetInfo, MirrorOracle } from '@mirror-protocol/mirror.js';
-import { Coins, Dec } from '@terra-money/terra.js';
+import { Asset, AssetInfo } from '@mirror-protocol/mirror.js';
+import { AccAddress, Coins, Dec, Int } from '@terra-money/terra.js';
 import * as _ from 'lodash';
 
-import { config } from './config';
+import { config, AssetConfig, activeNetwork, configFilePath } from './config';
 
 export type InputParser<T> = (input: string) => T;
 
 export namespace Parse {
+  export function assetTokenOrAccAddress(input?: string): AccAddress {
+    if (AccAddress.validate(input)) {
+      return input;
+    } else {
+      return Parse.assetConfig(input).token;
+    }
+  }
+
+  export function accAddress(input?: string): AccAddress {
+    if (input === undefined) {
+      return undefined;
+    }
+
+    if (!AccAddress.validate(input)) {
+      throw new Error(`Invalid Terra account address: ${input}`);
+    }
+
+    return input;
+  }
+
+  export function assetConfig(input: string): AssetConfig {
+    if (config.assets[input] === undefined) {
+      throw new Error(
+        `Asset '${input}' not found in registry; please add info to networks[${activeNetwork}][assets][${input}] in ${configFilePath}`
+      );
+    }
+
+    return config.assets[input];
+  }
+
   export function prices(
     input: string[]
   ): { asset_token: string; price: Dec }[] {
     return _.map(input, p => {
       const data = p.split(':');
       return {
-        asset_token: data[0],
+        asset_token: Parse.assetConfig(data[0]).token,
         price: Parse.dec(data[1]),
       };
     });
   }
 
-  export function int(input: string): number {
+  export function int(input?: string): number {
+    if (input === undefined) {
+      return undefined;
+    }
     return Number.parseInt(input);
   }
 
-  export function coins(input: string): Coins {
+  export function uint128(input?: string): Int {
+    if (input === undefined) {
+      return undefined;
+    }
+    return new Int(input);
+  }
+
+  export function coins(input?: string): Coins {
+    if (input === undefined) {
+      return undefined;
+    }
     return Coins.fromString(input);
   }
-  export function dec(input: string): Dec {
+
+  export function dec(input?: string): Dec {
+    if (input === undefined) {
+      return undefined;
+    }
     return new Dec(input);
   }
 
@@ -47,11 +94,11 @@ export namespace Parse {
         },
         amount: matches[1],
       };
-    } else if (matches[2] in config.assets) {
+    } else if (config.assets[matches[2]] !== undefined) {
       return {
         info: {
           token: {
-            contract_addr: config.assets[matches[2]].token,
+            contract_addr: Parse.assetConfig(matches[2]).token,
           },
         },
         amount: matches[1],
@@ -76,10 +123,10 @@ export namespace Parse {
           denom: input,
         },
       };
-    } else if (input in config.assets) {
+    } else if (config.assets[input] !== undefined) {
       return {
         token: {
-          contract_addr: config.assets[input].token,
+          contract_addr: Parse.assetConfig(input).token,
         },
       };
     } else {

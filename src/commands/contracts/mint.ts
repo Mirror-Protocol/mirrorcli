@@ -18,21 +18,23 @@ const updateConfig = exec
   .action(() => {
     handleExecCommand(exec, mirror =>
       mirror.mint.updateConfig({
-        owner: updateConfig.owner,
-        token_code_id: updateConfig.tokenCodeId,
+        owner: Parse.accAddress(updateConfig.owner),
+        token_code_id: Parse.int(updateConfig.tokenCodeId),
       })
     );
   });
 
 const updateAsset = exec
   .command('update-asset <asset-token>')
-  .description('Update a registered asset')
+  .description('Update a registered asset', {
+    'asset-token': '(symbol / AccAddress) asset to update',
+  })
   .option('--auction-discount <float>', 'New auction discount')
   .option('--min-col-ratio <float>', 'New min. collateral ratio')
   .action((assetToken: string) => {
     handleExecCommand(exec, mirror =>
       mirror.mint.updateAsset(
-        assetToken,
+        Parse.assetTokenOrAccAddress(assetToken),
         Parse.dec(updateAsset.auctionDiscount),
         Parse.dec(updateAsset.minColRatio)
       )
@@ -41,7 +43,7 @@ const updateAsset = exec
 const registerAsset = exec
   .command('register-asset <asset-token> <auction-discount> <min-col-ratio>')
   .description('Register a new asset', {
-    'asset-token': '(AccAddress) Address of token contract',
+    'asset-token': '(symbol / AccAddress) Address of mAsset token',
     'auction-discount': '(Dec) Auction discount rate',
     'min-col-ratio': '(Dec) Min. collateral ratio',
   })
@@ -49,7 +51,7 @@ const registerAsset = exec
     (assetToken: string, auctionDiscount: string, minColRatio: string) => {
       handleExecCommand(exec, mirror =>
         mirror.mint.registerAsset(
-          assetToken,
+          Parse.assetTokenOrAccAddress(assetToken),
           Parse.dec(auctionDiscount),
           Parse.dec(minColRatio)
         )
@@ -76,20 +78,22 @@ const openPosition = exec
       )
     );
   });
+
 const deposit = exec
   .command('deposit <position-idx> <col>')
   .description('Deposit collateral to a CDP')
   .action((positionIdx: string, col: string) => {
     handleExecCommand(exec, mirror =>
-      mirror.mint.deposit(Parse.int(positionIdx), Parse.asset(col))
+      mirror.mint.deposit(Parse.uint128(positionIdx), Parse.asset(col))
     );
   });
+
 const withdraw = exec
   .command('withdraw <position-idx> <col>')
   .description('Withdraw collateral from a CDP')
   .action((positionIdx: string, col: string) => {
     handleExecCommand(exec, mirror =>
-      mirror.mint.withdraw(Parse.int(positionIdx), Parse.asset(col))
+      mirror.mint.withdraw(Parse.uint128(positionIdx), Parse.asset(col))
     );
   });
 const mint = exec
@@ -98,7 +102,7 @@ const mint = exec
   .action((positionIdx: string, asset: string) => {
     handleExecCommand(exec, mirror =>
       mirror.mint.mint(
-        Parse.int(positionIdx),
+        Parse.uint128(positionIdx),
         Parse.asset(asset) as Asset<Token>
       )
     );
@@ -109,7 +113,7 @@ const burn = exec
   .action((positionIdx: string, asset: string) => {
     handleExecCommand(exec, mirror =>
       mirror.mint.burn(
-        Parse.int(positionIdx),
+        Parse.uint128(positionIdx),
         Parse.asset(asset) as Asset<Token>
       )
     );
@@ -120,7 +124,7 @@ const auction = exec
   .action((positionIdx: string, asset: string) => {
     handleExecCommand(exec, mirror =>
       mirror.mint.auction(
-        Parse.int(positionIdx),
+        Parse.uint128(positionIdx),
         Parse.asset(asset) as Asset<Token>
       )
     );
@@ -137,9 +141,13 @@ const getConfig = query
 
 const getAssetConfig = query
   .command('asset-config <asset-token>')
-  .description('Query Asset configuration')
+  .description('Query Asset configuration', {
+    'asset-token': '(symbol / AccAdddress) asset to look up',
+  })
   .action((assetToken: string) => {
-    handleQueryCommand(query, mirror => mirror.mint.getAssetConfig(assetToken));
+    handleQueryCommand(query, mirror =>
+      mirror.mint.getAssetConfig(Parse.assetTokenOrAccAddress(assetToken))
+    );
   });
 
 const getPosition = query
@@ -147,7 +155,7 @@ const getPosition = query
   .description('Query individual CDP')
   .action((positionIdx: string) => {
     handleQueryCommand(query, mirror =>
-      mirror.mint.getPosition(Parse.int(positionIdx))
+      mirror.mint.getPosition(Parse.uint128(positionIdx))
     );
   });
 
@@ -161,8 +169,8 @@ const getPositions = query
     handleQueryCommand(query, mirror =>
       mirror.mint.getPositions(
         getPositions.owner,
-        getPositions.startAfter,
-        getPositions.limit
+        Parse.uint128(getPositions.startAfter),
+        Parse.int(getPositions.limit)
       )
     );
   });

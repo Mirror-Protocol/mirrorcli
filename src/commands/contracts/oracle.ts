@@ -16,7 +16,7 @@ const updateConfig = exec
   .action(() => {
     handleExecCommand(exec, mirror =>
       mirror.oracle.updateConfig({
-        owner: updateConfig.owner,
+        owner: Parse.accAddress(updateConfig.owner),
       })
     );
   });
@@ -29,7 +29,10 @@ const registerAsset = exec
   })
   .action((assetToken: string, feeder: string) => {
     handleExecCommand(exec, mirror =>
-      mirror.oracle.registerAsset(assetToken, feeder)
+      mirror.oracle.registerAsset(
+        Parse.assetTokenOrAccAddress(assetToken),
+        Parse.accAddress(feeder)
+      )
     );
   });
 
@@ -56,33 +59,44 @@ const getConfig = query
 const getFeeder = query
   .command('feeder <asset-token>')
   .description('Query oracle feeder for asset', {
-    'asset-token': '(AccAddress) contract address to use',
+    'asset-token': '(symbol / AccAddress) asset to get feeder for',
   })
   .action((assetToken: string) => {
-    handleQueryCommand(query, mirror => mirror.oracle.getFeeder(assetToken));
+    handleQueryCommand(query, mirror =>
+      mirror.oracle.getFeeder(Parse.assetTokenOrAccAddress(assetToken))
+    );
   });
 
 const getPrice = query
   .command('price <base-asset> [quote-asset]')
   .description('Query current price of base asset denominated in quote asset', {
-    'base-asset': '(AccAddress) asset to get price of',
+    'base-asset': '(symbol / AccAddress) asset to get price of',
     'quote-asset':
-      '(AccAddress | uusd): asset in which returned price should be denominated (default. uusd)',
+      '(symbol / AccAddress | uusd): asset in which returned price should be denominated (default. uusd)',
   })
-  .action((baseAsset: string, quoteAsset?: string) => {
+  .action((baseAsset: string, quoteAsset: string = 'uusd') => {
+    if (quoteAsset !== 'uusd') {
+      quoteAsset = Parse.assetTokenOrAccAddress(quoteAsset);
+    }
     handleQueryCommand(query, mirror => {
-      return mirror.oracle.getPrice(baseAsset, quoteAsset || 'uusd');
+      return mirror.oracle.getPrice(
+        Parse.assetTokenOrAccAddress(baseAsset),
+        quoteAsset
+      );
     });
   });
 
 const getPrices = query
   .command('prices')
   .description('Query current prices of all registered assets')
-  .option('--start-after <int>', 'index of to start query')
+  .option('--start-after <string>', 'index of to start query')
   .option('--limit <int>', 'max number of results to receive')
   .action(() => {
     handleQueryCommand(query, mirror => {
-      return mirror.oracle.getPrices(getPrices.startAfter, getPrices.limit);
+      return mirror.oracle.getPrices(
+        getPrices.startAfter,
+        Parse.int(getPrices.limit)
+      );
     });
   });
 

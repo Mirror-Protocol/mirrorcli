@@ -21,6 +21,13 @@ export namespace MirrorCLIConfig {
   export const SCHEMA = configSchema;
 }
 
+export interface AssetConfig {
+  name: string;
+  token: AccAddress;
+  pair: AccAddress;
+  lpToken: AccAddress;
+}
+
 export interface MirrorCLINetworkConfig {
   lcd: {
     chainId: string;
@@ -40,12 +47,7 @@ export interface MirrorCLINetworkConfig {
     terraswap: AccAddress;
   };
   assets: {
-    [symbol: string]: {
-      name: string;
-      token: AccAddress;
-      pair: AccAddress;
-      lpToken: AccAddress;
-    };
+    [symbol: string]: AssetConfig;
   };
 }
 

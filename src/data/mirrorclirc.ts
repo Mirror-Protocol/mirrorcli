@@ -120,17 +120,31 @@ export default {
       },
 
       contracts: {
-        collector: 'terra1jmj39n0tfg6qu852fx0kr46gn4sewq6uyqyu8t',
-        factory: 'terra1ndzjhjszw4pp8dkkt864drgmwhc59padjfccxg',
-        gov: 'terra12pf2c9k7m2ag2893aa6sv75nmytr9uuxzv8vgx',
-        mint: 'terra1ycsd7mlffq2ksmqdr20y4drtf6ctw3n8fmup5g',
-        oracle: 'terra14nh9jzg6gx3qp2jnlg5lvkmky40uxu7w9mgevz',
-        staking: 'terra1xxqqw7vysmh2wnq3y6hgh7d2ytmgazw62f28hh',
-        'mirror-token': 'terra16y2ew6rmnehu9fn45jj55w4g37d62xgjz8zsx9',
-        terraswap: 'terra10w3rtrs8fmgwy6rsh2xwq6x27ym4kpz3698dr4',
+        collector: 'terra18jfvthj7f6fxlxy3793xttd4kw492t4ku5yxau',
+        factory: 'terra1qxxlalvsdjd07p07y3rc5fu6ll8k4tme7cye8y',
+        gov: 'terra1sh36qn08g4cqg685cfzmyxqv2952q6r8gpczrt',
+        mint: 'terra1z449mpul3pwkdd3892gv28ewv5l06w7895wewm',
+        staking: 'terra138y2ppmkgq78wfp5mwj9jqu96vylgs3dpdn5ux',
+        oracle: 'terra1plju286nnfj3z54wgcggd4enwaa9fgf5kgrgzl',
+        terraswap: 'terra18dt935pdcn2ka6l0syy5gt20wa48n3mktvdvjj',
+        'mirror-token': 'terra1g6uv2xzfcc4mae8mw6unhdzv9cdy5p62ck8ylr',
       },
 
-      assets: {},
+      assets: {
+        MIR: {
+          name: 'Mirror Token',
+          token: 'terra1g6uv2xzfcc4mae8mw6unhdzv9cdy5p62ck8ylr',
+          pair: 'terra1sfga5c35trjwvgpfz8r7mh0zfecs3y2flf4khl',
+          lpToken: 'terra15cv6vq9rn273p99hk0df5cc8z0kmjsevwlwjar',
+        },
+
+        mAAPL: {
+          name: 'Apple Inc.',
+          token: 'terra1y336dak40tf300jyamuq3trlxne9qajczc884s',
+          pair: 'terra1edqzdggfclw6t5dg8y0n05kk0k7te3ra5n6yw9',
+          lpToken: 'terra1pe72s6w69rdzrqyuu4eaf7sp8ushzf6w757gyf',
+        },
+      },
     },
   },
 };
