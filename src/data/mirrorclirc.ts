@@ -1,4 +1,8 @@
-export default {
+import { MirrorCLINetworkConfig } from 'util/config';
+
+const defaultConfig: {
+  networks: { [network: string]: MirrorCLINetworkConfig };
+} = {
   networks: {
     'columbus-4': {
       lcd: {
@@ -22,7 +26,7 @@ export default {
         oracle: 'terra14nh9jzg6gx3qp2jnlg5lvkmky40uxu7w9mgevz',
         staking: 'terra1xxqqw7vysmh2wnq3y6hgh7d2ytmgazw62f28hh',
         'mirror-token': 'terra16y2ew6rmnehu9fn45jj55w4g37d62xgjz8zsx9',
-        terraswap: 'terra10w3rtrs8fmgwy6rsh2xwq6x27ym4kpz3698dr4',
+        terraswap: 'terra1ulgw0td86nvs4wtpsc80thv6xelk76ut7a7apj',
       },
 
       assets: {
@@ -57,21 +61,18 @@ export default {
           lpToken: 'terra1ch6d5kdenshk2zktap2s05arytpn8xhdffarvc',
         },
         mQQQ: {
-          symbol: 'mQQQ',
           name: 'Invesco QQQ Trust',
           token: 'terra1hu7u866jla3vgckf4sd6vjdfxzuqvzvu0ekpc9',
           pair: 'terra19ujpfl5djdrp6w4w30vtx9cremz25gkg9nzcfa',
           lpToken: 'terra1cj8rcff3djz86rarg3uw3nzgdy2trgvj5egvdl',
         },
         mTWTR: {
-          symbol: 'mTWTR',
           name: 'Twitter',
           token: 'terra1ua295n83qqm7kncn6g704d2a3hpmtjyx7f07u7',
           pair: 'terra14q8szcr0gy5pzksve5sp7e94kqqa0xlc3g2y9u',
           lpToken: 'terra1wunltsvvl2gfsnpwc4hf9pdxt6tnp7rt877ny8',
         },
         mBABA: {
-          symbol: 'mBABA',
           name: 'Alibaba Group Holdings Ltd ADR',
           token: 'terra1vekqnp3tgukt90lqfumu5467jw9jy4eewzn2fu',
           pair: 'terra1q5gyld4cjr59fdk2rjuuzs200ks28lp08fudnt',
@@ -103,6 +104,26 @@ export default {
         },
       },
     },
+
+    // for usage with Testnet
+    // 'tequila-0004': {
+    //   lcd: {
+    //     chainId: 'tequila-0004',
+    //     url: 'https://tequila-lcd.terra.dev',
+    //     gasPrices: {
+    //       uluna: 0.15,
+    //       uusd: 0.15,
+    //       usdr: 0.1018,
+    //       ukrw: 178.05,
+    //       umnt: 431.6259,
+    //     },
+    //     gasAdjustment: 1.2,
+    //   },
+
+    //   contracts: {
+    //     terraswap: 'terra18qpjm4zkvqnpjpw0zn0tdr8gdzvt8au35v45xf',
+    //   },
+    // },
 
     // for usage with LocalMirror
     localterra: {
@@ -148,3 +169,5 @@ export default {
     },
   },
 };
+
+export default defaultConfig;

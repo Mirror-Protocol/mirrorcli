@@ -1,7 +1,7 @@
 import { homedir } from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
-import { AccAddress, Coins, Numeric } from '@terra-money/terra.js';
+import { AccAddress } from '@terra-money/terra.js';
 
 import { Validator } from 'jsonschema';
 import * as _ from 'lodash';
