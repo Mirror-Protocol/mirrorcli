@@ -9,6 +9,95 @@ import {
 const exec = createExecMenu('mirror-token', 'Mirror Token contract functions');
 exec.alias('MIR');
 
+const transfer = exec
+  .command('transfer <recipient> <amount>')
+  .description(`Send tokens to account`, {
+    recipient: '(AccAddress) recipient',
+    amount: '(Uint128) amount to send',
+  })
+  .action((recipient: string, amount: string) => {
+    handleExecCommand(exec, mirror =>
+      mirror.mirrorToken.transfer(
+        Parse.accAddress(recipient),
+        Parse.uint128(amount)
+      )
+    );
+  });
+
+const transferFrom = exec
+  .command('transfer-from <owner> <recipient> <amount>')
+  .description(`Send tokens to account using allowance`, {
+    owner: '(AccAddress) owner to spend from',
+    recipient: '(AccAddress) recipient',
+    amount: '(Uint128) amount to send',
+  })
+  .action((owner: string, recipient: string, amount: string) => {
+    handleExecCommand(exec, mirror =>
+      mirror.mirrorToken.transferFrom(
+        Parse.accAddress(owner),
+        Parse.accAddress(recipient),
+        Parse.uint128(amount)
+      )
+    );
+  });
+
+const send = exec
+  .command('send <contract> <amount>')
+  .description(
+    `Send tokens to contract account with possibility to execute message`,
+    {
+      contract: '(AccAddress) contract recipient',
+      recipient: '(Uint128) amount to send',
+    }
+  )
+  .option('--msg <string>', 'string of JSON Receive hook to run')
+  .action((contract: string, amount: string) => {
+    handleExecCommand(exec, mirror =>
+      mirror.mirrorToken.send(
+        Parse.accAddress(contract),
+        Parse.uint128(amount),
+        send.msg
+      )
+    );
+  });
+
+const sendFrom = exec
+  .command('send-from <owner> <contract> <amount>')
+  .description(
+    `Send tokens to contract account with possibility to execute message, from allowance`,
+    {
+      owner: '(AccAddress) owner to spend from',
+      contract: '(AccAddress) contract recipient',
+      recipient: '(Uint128) amount to send',
+    }
+  )
+  .option('--msg <string>', 'string of JSON Receive hook to run')
+  .action((owner: string, contract: string, amount: string) => {
+    handleExecCommand(exec, mirror =>
+      mirror.mirrorToken.sendFrom(
+        Parse.accAddress(owner),
+        Parse.accAddress(contract),
+        Parse.uint128(amount),
+        sendFrom.msg
+      )
+    );
+  });
+
+const mint = exec
+  .command('mint <recipient> <amount>')
+  .description(`Mint and send tokens to account`, {
+    recipient: '(AccAddress) recipient',
+    amount: '(Uint128) amount to mint and send',
+  })
+  .action((recipient: string, amount: string) => {
+    handleExecCommand(exec, mirror =>
+      mirror.mirrorToken.mint(
+        Parse.accAddress(recipient),
+        Parse.uint128(amount)
+      )
+    );
+  });
+
 const burn = exec
   .command('burn <amount>')
   .description(`Burns MIR token`, {
@@ -22,7 +111,7 @@ const burn = exec
 
 const burnFrom = exec
   .command('burn-from <owner> <amount>')
-  .description(`Burns MIR token`, {
+  .description(`Burns MIR token from owner`, {
     owner: '(AccAddress) account to burn from',
     amount: '(Uint128) amount to burn',
   })
@@ -37,7 +126,7 @@ const burnFrom = exec
 
 const increaseAllowance = exec
   .command('increase-allowance <spender> <amount>')
-  .description(`Burns MIR token`, {
+  .description(`Increase allowance for spender`, {
     spender: '(AccAddress) spender',
     amount: '(Uint128) amount to increase allowance by',
   })
@@ -54,7 +143,7 @@ const increaseAllowance = exec
 
 const decreaseAllowance = exec
   .command('decrease-allowance <spender> <amount>')
-  .description(`Burns MIR token`, {
+  .description(`Decreases allowance for spender`, {
     spender: '(AccAddress) spender',
     amount: '(Uint128) amount to decrease allowance by',
   })
@@ -112,14 +201,14 @@ const getAllAllowances = query
   .description('Query all Mirror Token allowances', {
     owner: '(AccAddress) owner address',
   })
-  .option('--start-after <int>', 'index of to start query')
+  .option('--start-after <string>', 'index of to start query')
   .option('--limit <int>', 'max number of results to receive')
   .action((owner: string) => {
     handleQueryCommand(query, mirror =>
       mirror.mirrorToken.getAllAllowances(
-        owner,
+        Parse.accAddress(owner),
         getAllAllowances.startAfter,
-        getAllAllowances.limit
+        Parse.int(getAllAllowances.limit)
       )
     );
   });
@@ -133,7 +222,7 @@ const getAllAccounts = query
     handleQueryCommand(query, mirror =>
       mirror.mirrorToken.getAllAccounts(
         getAllAccounts.startAfter,
-        getAllAccounts.limit
+        Parse.int(getAllAccounts.limit)
       )
     );
   });
