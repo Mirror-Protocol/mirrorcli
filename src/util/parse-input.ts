@@ -94,7 +94,7 @@ export namespace Parse {
       return undefined;
     }
 
-    const matches = input.match(/([0-9]+)(u[a-z]{3}|m[a-zA-Z]+|MIR)/);
+    const matches = input.match(/([0-9]+)(u[a-z]{3,4}|m[a-zA-Z]+|MIR)/);
     if (matches === null) {
       throw new Error(
         `unable to parse Asset from '${input}'; must be like: 123uusd (native), 123mAAPL (mAsset), 123MIR (Mirror Token)`
