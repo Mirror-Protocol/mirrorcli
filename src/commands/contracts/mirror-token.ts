@@ -50,7 +50,7 @@ const send = exec
       recipient: '(Uint128) amount to send',
     }
   )
-  .option('--msg <string>', 'string of JSON Receive hook to run')
+  .option('--msg <json>', 'string of JSON Receive hook to run')
   .action((contract: string, amount: string) => {
     handleExecCommand(exec, mirror =>
       mirror.mirrorToken.send(
@@ -71,7 +71,7 @@ const sendFrom = exec
       recipient: '(Uint128) amount to send',
     }
   )
-  .option('--msg <string>', 'string of JSON Receive hook to run')
+  .option('--msg <json>', 'string of JSON Receive hook to run')
   .action((owner: string, contract: string, amount: string) => {
     handleExecCommand(exec, mirror =>
       mirror.mirrorToken.sendFrom(
@@ -181,7 +181,9 @@ const getBalance = query
     address: '(AccAddress) address to query',
   })
   .action((address?: string) => {
-    handleQueryCommand(query, mirror => mirror.mirrorToken.getBalance(address));
+    handleQueryCommand(query, mirror =>
+      mirror.mirrorToken.getBalance(Parse.accAddress(address))
+    );
   });
 
 const getAllowance = query
@@ -192,7 +194,10 @@ const getAllowance = query
   })
   .action((owner: string, spender: string) => {
     handleQueryCommand(query, mirror =>
-      mirror.mirrorToken.getAllowance(owner, spender)
+      mirror.mirrorToken.getAllowance(
+        Parse.accAddress(owner),
+        Parse.accAddress(spender)
+      )
     );
   });
 
@@ -216,7 +221,7 @@ const getAllAllowances = query
 const getAllAccounts = query
   .command('accounts')
   .description('Query all Mirror Token accounts')
-  .option('--start-after <string>', 'prfix to start query')
+  .option('--start-after <string>', 'prefix to start query')
   .option('--limit <int>', 'max number of results to receive')
   .action(() => {
     handleQueryCommand(query, mirror =>
