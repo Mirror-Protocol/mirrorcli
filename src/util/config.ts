@@ -32,8 +32,10 @@ export interface MirrorCLINetworkConfig {
   lcd: {
     chainId: string;
     url: string;
-    gasPrices?: Coins.Input;
-    gasAdjustment?: Numeric.Input;
+    gasPrices?: {
+      [denom: string]: number;
+    };
+    gasAdjustment?: number;
   };
 
   contracts: {

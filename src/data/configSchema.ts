@@ -25,8 +25,8 @@ export default {
       },
       required: ['lpToken', 'name', 'pair', 'token'],
     },
-    MirrorCLIConfig: {
-      title: 'MirrorCLIConfig',
+    MirrorCLINetworkConfig: {
+      title: 'MirrorCLINetworkConfig',
       type: 'object',
       properties: {
         lcd: {
@@ -42,31 +42,17 @@ export default {
             },
             gasPrices: {
               type: 'object',
-              title: 'gasPrices',
-              properties: {
-                uusd: {
-                  type: 'number',
-                },
-                umnt: {
-                  type: 'number',
-                },
-                usdr: {
-                  type: 'number',
-                },
-                uluna: {
-                  type: 'number',
-                },
-                ukrw: {
-                  type: 'number',
-                },
+              additionalProperties: {
+                type: 'number',
               },
-              additionalProperties: false,
+              title: 'gasPrices',
             },
             gasAdjustment: {
               type: 'number',
               title: 'gasAdjustment',
             },
           },
+          required: ['chainId', 'url'],
           title: 'lcd',
         },
         contracts: {
@@ -100,25 +86,46 @@ export default {
               type: 'string',
               title: 'mirror-token',
             },
-            'ts-factory': {
+            terraswap: {
               type: 'string',
-              title: 'ts-factory',
-            },
-            'ts-pair': {
-              type: 'string',
-              title: 'ts-pair',
+              title: 'terraswap',
             },
           },
+          required: [
+            'collector',
+            'factory',
+            'gov',
+            'mint',
+            'mirror-token',
+            'oracle',
+            'staking',
+            'terraswap',
+          ],
           title: 'contracts',
         },
         assets: {
           type: 'object',
           additionalProperties: {
-            $ref: '#/definitions/AssetConfig',
+            type: 'string',
           },
           title: 'assets',
         },
       },
+      required: ['assets', 'contracts', 'lcd'],
+    },
+    MirrorCLIConfig: {
+      title: 'MirrorCLIConfig',
+      type: 'object',
+      properties: {
+        networks: {
+          type: 'object',
+          additionalProperties: {
+            $ref: '#/definitions/MirrorCLINetworkConfig',
+          },
+          title: 'networks',
+        },
+      },
+      required: ['networks'],
     },
   },
 };
