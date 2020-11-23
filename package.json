@@ -5,7 +5,7 @@
   "main": "dist/bundle.node.js",
   "typings": "dist/index.d.ts",
   "author": "Mirror Protocol",
-  "license": "MIT",
+  "license": "Apache 2.0",
   "bin": {
     "mirrorcli": "bin/mirrorcli"
   },
