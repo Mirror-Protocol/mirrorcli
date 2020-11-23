@@ -6,6 +6,7 @@ Command-line interface for Mirror Protocol on Terra.
 
 - [Installation](#installation)
 - [Configuration](#configuration)
+  - [Specifying which chain to use [IMPORTANT]](#specifying-which-chain-to-use-important)
 - [Usage](#usage)
   - [Execute](#execute)
   - [Query](#query)
@@ -17,9 +18,9 @@ Command-line interface for Mirror Protocol on Terra.
 
 - Node.js 12+
 - NPM
-- (`terracli`)[https://github.com/terra-project/core] in your path
+- [`terracli`](https://github.com/terra-project/core) in your path
 
-`mirrorcli` can be through off NPM.
+`mirrorcli` can be installed off NPM.
 
 ```bash
 $ npm install -g @mirror-protocol/mirrorcli
@@ -50,6 +51,23 @@ The entrypoint `mirrorcli` should then be available in your `path`:
 ## Configuration
 
 `mirrorcli` will create a configuration file in your home directory: `$HOME/.mirrorclirc.json`.
+
+### Specifying which chain to use [IMPORTANT]
+
+By default, `mirrorcli` will use the `columbus-4` (Terra mainnet) configuration. In order to change the chain, set the `MIRRORCLI_NETWORK` environment variable to the desired chain ID.
+
+For example, to use on the official testnet `tequila-0004`:
+
+```sh
+$ MIRRORCLI_NETWORK=tequila-0004 mirrorcli x mint [deposit ...]
+```
+
+OR:
+
+```sh
+$ export MIRRORCLI_NETWORK=tequila-0004
+$ mirrorcli x mint [deposit ...]
+```
 
 ## Usage
 
