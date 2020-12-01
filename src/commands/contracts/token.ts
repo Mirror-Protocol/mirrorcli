@@ -124,7 +124,7 @@ const mint = exec
 
 const burn = exec
   .command('burn <asset>')
-  .description(`Burns MIR token`, {
+  .description(`Burns tokens`, {
     asset: '(Asset) amount of asset to burn',
   })
   .action(async (asset: string) => {
@@ -135,7 +135,7 @@ const burn = exec
 
 const burnFrom = exec
   .command('burn-from <owner> <asset>')
-  .description(`Burns MIR token from owner`, {
+  .description(`Burns tokens from owner`, {
     owner: '(AccAddress) account to burn from',
     asset: '(Asset) amount of asset to burn',
   })
@@ -185,7 +185,7 @@ const decreaseAllowance = exec
 
 const query = createQueryMenu('token', 'Terraswap CW20 Token contract queries');
 const getTokenInfo = query
-  .command('token-info <symbol>')
+  .command('info <symbol>')
   .description('Query token contract info', {
     symbol: '(symbol / AccAddress): token symbol or account address',
   })

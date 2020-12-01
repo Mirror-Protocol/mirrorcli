@@ -1,6 +1,5 @@
 import { MirrorGov } from '@mirror-protocol/mirror.js';
 import * as _ from 'lodash';
-import * as fs from 'fs';
 
 import { Parse } from '../../util/parse-input';
 import {
@@ -37,14 +36,27 @@ const createPoll = exec
   .requiredOption('--desc <string>', '*Poll description')
   .requiredOption('--deposit <Uint128>', '*deposit amount of MIR tokens')
   .option('--link <url>', 'URL with more information')
-  .option('--execute-msg <path>', 'File containing ExecuteMsg')
+  .option(
+    '--execute-to <AccAddress>',
+    'contract to execute on (specify message with --execute-msg)'
+  )
+  .option('--execute-msg <json>', 'message to execute')
   .action(() => {
-    let executeMsg: MirrorGov.ExecuteMsg | undefined;
+    let executeMsg: MirrorGov.ExecuteMsg;
 
-    if (createPoll.executeMsg) {
-      executeMsg = JSON.parse(
-        fs.readFileSync(createPoll.executeMsg).toString()
-      );
+    if (createPoll.executeTo || createPoll.executeMsg) {
+      if (
+        createPoll.executeTo === undefined ||
+        createPoll.executeMsg === undefined
+      ) {
+        throw new Error(
+          'both --execute-to and --execute-msg must be supplied if either is'
+        );
+      }
+      executeMsg = {
+        contract: createPoll.executeTo,
+        msg: Buffer.from(createPoll.executeMsg).toString('base64'),
+      };
     }
 
     handleExecCommand(exec, mirror =>

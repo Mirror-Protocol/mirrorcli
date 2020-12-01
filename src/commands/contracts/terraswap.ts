@@ -41,11 +41,11 @@ const updateConfig = exec
 const createPair = exec
   .command('create-pair <asset1> <asset2>')
   .description(`Create new Terraswap pair`)
-  .option('--hook <path>', 'File containing hook message to attach')
+  .option('--hook <json>', 'hook message to attach')
   .action((asset1: string, asset2: string) => {
     let hook: any;
     if (createPair.hook) {
-      hook = JSON.parse(fs.readFileSync(createPair.hook).toString());
+      hook = JSON.parse(createPair.hook);
     }
 
     handleExecCommand(exec, mirror =>

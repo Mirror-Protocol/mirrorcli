@@ -121,17 +121,16 @@ const migrateAsset = exec
   });
 
 const passCommand = exec
-  .command('pass-command <contract-address> <msg>')
+  .command('pass-command <contract-address>')
   .description(`Execute command as Mirror Factory`, {
     'contract-address': '(AccAddress) address of contract to call',
-    msg: '(path) file containing message to execute on specified contract',
   })
-  .action((contractAddress: string, msg: string) => {
+  .requiredOption('--msg <json>', 'message to execute')
+  .action((contractAddress: string) => {
     handleExecCommand(exec, mirror => {
-      const fileData = fs.readFileSync(msg).toString();
       return mirror.factory.passCommand(
         Parse.accAddress(contractAddress),
-        JSON.parse(fileData)
+        JSON.parse(passCommand.msg)
       );
     });
   });
