@@ -140,15 +140,17 @@ const query = createQueryMenu('factory', 'Mirror Factory contract queries');
 const getConfig = query
   .command('config')
   .description('Query Mirror Factory contract config')
-  .action(() => {
-    handleQueryCommand(query, mirror => mirror.factory.getConfig());
+  .action(async () => {
+    await handleQueryCommand(query, mirror => mirror.factory.getConfig());
   });
 
 const getDistributionInfo = query
   .command('distribution-info')
   .description('Query Mirror Factory distribution info')
-  .action(() => {
-    handleQueryCommand(query, mirror => mirror.factory.getDistributionInfo());
+  .action(async () => {
+    await handleQueryCommand(query, mirror =>
+      mirror.factory.getDistributionInfo()
+    );
   });
 
 export default {

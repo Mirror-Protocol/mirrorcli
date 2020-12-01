@@ -8,7 +8,8 @@ import Staking from './staking';
 import MirrorToken from './mirror-token';
 
 // Terraswap contracts
-import Terraswap from './terraswap';
+import TerraswapFactory from './terraswap';
+import Token from './token';
 
 export const mirror = [
   Collector,
@@ -20,4 +21,4 @@ export const mirror = [
   MirrorToken,
 ];
 
-export const terraswap = [Terraswap];
+export const terraswap = [TerraswapFactory, Token];

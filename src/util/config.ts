@@ -40,6 +40,7 @@ export interface MirrorCLINetworkConfig {
 
   contracts: {
     collector: AccAddress;
+    community: AccAddress;
     factory: AccAddress;
     gov: AccAddress;
     mint: AccAddress;

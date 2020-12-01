@@ -1,4 +1,4 @@
-import { Asset, AssetInfo } from '@mirror-protocol/mirror.js';
+import { Asset, AssetInfo, Token } from '@mirror-protocol/mirror.js';
 import { AccAddress, Coins, Dec, Int } from '@terra-money/terra.js';
 import * as _ from 'lodash';
 
@@ -87,6 +87,10 @@ export namespace Parse {
       return undefined;
     }
     return new Dec(input);
+  }
+
+  export function assetTokenAddress(input?: string): AccAddress {
+    return (asset(input) as Asset<Token>).info.token.contract_addr;
   }
 
   export function asset(input?: string): Asset<AssetInfo> {

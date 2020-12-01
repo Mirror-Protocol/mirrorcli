@@ -13,8 +13,8 @@ const convert = exec
   .description(`Convert contract's balance of asset to UST or MIR`, {
     'asset-token': '(symbol / AccAddress) mAsset or MIR token',
   })
-  .action((assetToken: string) => {
-    handleExecCommand(exec, mirror =>
+  .action(async (assetToken: string) => {
+    await handleExecCommand(exec, mirror =>
       mirror.collector.convert(Parse.assetTokenOrAccAddress(assetToken))
     );
   });
@@ -24,16 +24,16 @@ const send = exec
   .description(
     `Sends contract's balance of MIR to distribution (Mirror Gov) contract`
   )
-  .action(() => {
-    handleExecCommand(exec, mirror => mirror.collector.send());
+  .action(async () => {
+    await handleExecCommand(exec, mirror => mirror.collector.send());
   });
 
 const query = createQueryMenu('collector', 'Mirror Collector contract queries');
 const getConfig = query
   .command('config')
   .description('Query Mirror Collector contract config')
-  .action(() => {
-    handleQueryCommand(query, mirror => mirror.collector.getConfig());
+  .action(async () => {
+    await handleQueryCommand(query, mirror => mirror.collector.getConfig());
   });
 
 export default {

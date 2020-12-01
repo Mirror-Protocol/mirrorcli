@@ -4,6 +4,32 @@ const defaultConfig: {
   networks: { [network: string]: MirrorCLINetworkConfig };
 } = {
   networks: {
+    'tequila-0004': {
+      lcd: {
+        chainId: 'tequila-0004',
+        url: 'https://tequila-lcd.terra.dev',
+        gasPrices: {
+          uluna: 0.15,
+          usdr: 0.1018,
+          uusd: 0.15,
+          ukrw: 178.05,
+          umnt: 431.6259,
+        },
+        gasAdjustment: 1.2,
+      },
+      contracts: {
+        collector: 'terra1v046ktavwzlyct5gh8ls767fh7hc4gxc95grxy',
+        community: 'terra10qm80sfht0zhh3gaeej7sd4f92tswc44fn000q',
+        factory: 'terra10l9xc9eyrpxd5tqjgy6uxrw7dd9cv897cw8wdr',
+        gov: 'terra12r5ghc6ppewcdcs3hkewrz24ey6xl7mmpk478s',
+        mint: 'terra1s9ehcjv0dqj2gsl72xrpp0ga5fql7fj7y3kq3w',
+        oracle: 'terra1uvxhec74deupp47enh7z5pk55f3cvcz8nj4ww9',
+        staking: 'terra1a06dgl27rhujjphsn4drl242ufws267qxypptx',
+        'mirror-token': 'terra10llyp6v3j3her8u3ce66ragytu45kcmd9asj3u',
+        terraswap: 'terra1ulgw0td86nvs4wtpsc80thv6xelk76ut7a7apj',
+      },
+      assets: {},
+    },
     'columbus-4': {
       lcd: {
         chainId: 'columbus-4',
@@ -20,6 +46,7 @@ const defaultConfig: {
 
       contracts: {
         collector: 'terra1jmj39n0tfg6qu852fx0kr46gn4sewq6uyqyu8t',
+        community: '',
         factory: 'terra1ndzjhjszw4pp8dkkt864drgmwhc59padjfccxg',
         gov: 'terra12pf2c9k7m2ag2893aa6sv75nmytr9uuxzv8vgx',
         mint: 'terra1ycsd7mlffq2ksmqdr20y4drtf6ctw3n8fmup5g',
@@ -101,69 +128,6 @@ const defaultConfig: {
           token: 'terra1kmt8vekwu4aq6l9y50n8hg9zcdzd3tqdp8lgdr',
           pair: 'terra195fcntnznx4f676gf383g02yguhync2fsuk03x',
           lpToken: 'terra1svhet09r7ulhyr4vs4fl6j6lnam94q6natumck',
-        },
-      },
-    },
-
-    // for usage with Testnet
-    // 'tequila-0004': {
-    //   lcd: {
-    //     chainId: 'tequila-0004',
-    //     url: 'https://tequila-lcd.terra.dev',
-    //     gasPrices: {
-    //       uluna: 0.15,
-    //       uusd: 0.15,
-    //       usdr: 0.1018,
-    //       ukrw: 178.05,
-    //       umnt: 431.6259,
-    //     },
-    //     gasAdjustment: 1.2,
-    //   },
-
-    //   contracts: {
-    //     terraswap: 'terra18qpjm4zkvqnpjpw0zn0tdr8gdzvt8au35v45xf',
-    //   },
-    // },
-
-    // for usage with LocalMirror
-    localterra: {
-      lcd: {
-        chainId: 'localterra',
-        url: 'http://127.0.0.1:1317',
-        gasPrices: {
-          uluna: 0.00506,
-          uusd: 0.0015,
-          usdr: 0.00102,
-          ukrw: 1.7805,
-          umnt: 4.31626,
-        },
-        gasAdjustment: 1.2,
-      },
-
-      contracts: {
-        collector: 'terra18jfvthj7f6fxlxy3793xttd4kw492t4ku5yxau',
-        factory: 'terra1qxxlalvsdjd07p07y3rc5fu6ll8k4tme7cye8y',
-        gov: 'terra1sh36qn08g4cqg685cfzmyxqv2952q6r8gpczrt',
-        mint: 'terra1z449mpul3pwkdd3892gv28ewv5l06w7895wewm',
-        staking: 'terra138y2ppmkgq78wfp5mwj9jqu96vylgs3dpdn5ux',
-        oracle: 'terra1plju286nnfj3z54wgcggd4enwaa9fgf5kgrgzl',
-        terraswap: 'terra18dt935pdcn2ka6l0syy5gt20wa48n3mktvdvjj',
-        'mirror-token': 'terra1g6uv2xzfcc4mae8mw6unhdzv9cdy5p62ck8ylr',
-      },
-
-      assets: {
-        MIR: {
-          name: 'Mirror Token',
-          token: 'terra1g6uv2xzfcc4mae8mw6unhdzv9cdy5p62ck8ylr',
-          pair: 'terra1sfga5c35trjwvgpfz8r7mh0zfecs3y2flf4khl',
-          lpToken: 'terra15cv6vq9rn273p99hk0df5cc8z0kmjsevwlwjar',
-        },
-
-        mAAPL: {
-          name: 'Apple Inc.',
-          token: 'terra1y336dak40tf300jyamuq3trlxne9qajczc884s',
-          pair: 'terra1edqzdggfclw6t5dg8y0n05kk0k7te3ra5n6yw9',
-          lpToken: 'terra1pe72s6w69rdzrqyuu4eaf7sp8ushzf6w757gyf',
         },
       },
     },
