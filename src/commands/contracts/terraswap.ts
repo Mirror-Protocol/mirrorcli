@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-
 import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
@@ -17,44 +15,44 @@ import {
 import { config } from '../../util/config';
 import { Coin } from '@terra-money/terra.js';
 
-const exec = createExecMenu('terraswap', 'Terraswap contract functions');
+const exec = createExecMenu('Terraswap', 'Terraswap contract functions');
 exec.alias('ts');
 
 // factory
 
-const updateConfig = exec
-  .command('update-config')
-  .description(`Update Terraswap Factory contract config`)
-  .option('--owner <AccAddress>', 'New contract owner')
-  .option('--pair-code-id <int>', 'New pair code ID')
-  .option('--token-code-id <int>', 'New token code ID')
-  .action(() => {
-    handleExecCommand(exec, mirror =>
-      mirror.terraswapFactory.updateConfig({
-        owner: Parse.accAddress(updateConfig.owner),
-        pair_code_id: Parse.int(updateConfig.pairCodeId),
-        token_code_id: Parse.int(updateConfig.tokenCodeId),
-      })
-    );
-  });
+// const updateConfig = exec
+//   .command('update-config')
+//   .description(`Update Terraswap Factory contract config`)
+//   .option('--owner <AccAddress>', 'New contract owner')
+//   .option('--pair-code-id <int>', 'New pair code ID')
+//   .option('--token-code-id <int>', 'New token code ID')
+//   .action(() => {
+//     handleExecCommand(exec, mirror =>
+//       mirror.terraswapFactory.updateConfig({
+//         owner: Parse.accAddress(updateConfig.owner),
+//         pair_code_id: Parse.int(updateConfig.pairCodeId),
+//         token_code_id: Parse.int(updateConfig.tokenCodeId),
+//       })
+//     );
+//   });
 
-const createPair = exec
-  .command('create-pair <asset1> <asset2>')
-  .description(`Create new Terraswap pair`)
-  .option('--hook <json>', 'hook message to attach')
-  .action((asset1: string, asset2: string) => {
-    let hook: any;
-    if (createPair.hook) {
-      hook = JSON.parse(createPair.hook);
-    }
+// const createPair = exec
+//   .command('create-pair <asset1> <asset2>')
+//   .description(`Create new Terraswap pair`)
+//   .option('--hook <json>', 'hook message to attach')
+//   .action((asset1: string, asset2: string) => {
+//     let hook: any;
+//     if (createPair.hook) {
+//       hook = JSON.parse(createPair.hook);
+//     }
 
-    handleExecCommand(exec, mirror =>
-      mirror.terraswapFactory.createPair(
-        [Parse.assetInfo(asset1), Parse.assetInfo(asset2)],
-        hook as TerraswapFactory.InitHook
-      )
-    );
-  });
+//     handleExecCommand(exec, mirror =>
+//       mirror.terraswapFactory.createPair(
+//         [Parse.assetInfo(asset1), Parse.assetInfo(asset2)],
+//         hook as TerraswapFactory.InitHook
+//       )
+//     );
+//   });
 
 // pair
 
@@ -97,8 +95,8 @@ const swap = exec
     'Max % spread for transaction (if exceeded, tx will fail)'
   )
   .option('--send-to <string>', 'Account to send swapped funds to')
-  .action((fromAsset: string, toAssetInfo: string) => {
-    handleExecCommand(exec, mirror => {
+  .action(async (fromAsset: string, toAssetInfo: string) => {
+    await handleExecCommand(exec, mirror => {
       const offer = Coin.fromString(fromAsset);
       const pair = lookupPair(mirror, offer.denom, toAssetInfo);
 
@@ -132,8 +130,8 @@ const withdrawLiquidity = exec
       '(AssetInfo) liquidity pool from which to withdraw from e.g. mAAPL',
     amount: '(Uint128) amount of LP tokens to burn',
   })
-  .action((assetInfo: string, amount: string) => {
-    handleExecCommand(exec, mirror => {
+  .action(async (assetInfo: string, amount: string) => {
+    await handleExecCommand(exec, mirror => {
       const pair = lookupPair(mirror, assetInfo, 'uusd');
       const lpToken = new TerraswapToken({
         contractAddress: config.assets[assetInfo].lpToken,
@@ -149,8 +147,10 @@ query.alias('ts');
 const getConfig = query
   .command('config')
   .description('Query Terraswap Factory contract config')
-  .action(() => {
-    handleQueryCommand(query, mirror => mirror.terraswapFactory.getConfig());
+  .action(async () => {
+    await handleQueryCommand(query, mirror =>
+      mirror.terraswapFactory.getConfig()
+    );
   });
 
 const getPair = query
@@ -159,8 +159,8 @@ const getPair = query
     asset1: '(symbol / AccAddress / uusd) native coin or CW20 address',
     asset2: '(symbol / AccAddress / uusd) native coin or CW20 address',
   })
-  .action((asset1: string, asset2: string) => {
-    handleQueryCommand(query, mirror =>
+  .action(async (asset1: string, asset2: string) => {
+    await handleQueryCommand(query, mirror =>
       mirror.terraswapFactory.getPair([
         Parse.assetInfo(asset1),
         Parse.assetInfo(asset2),
@@ -176,8 +176,8 @@ const getPairs = query
     'pair after which to begin query. e.g. MIR/uusd'
   )
   .option('--limit <int>', 'max results to return')
-  .action(() => {
-    handleQueryCommand(query, mirror => {
+  .action(async () => {
+    await handleQueryCommand(query, mirror => {
       let startAfter: [AssetInfo, AssetInfo];
       if (getPairs.startAfter !== undefined) {
         const c = getPairs.startAfter.split('/');
@@ -198,8 +198,8 @@ const getSimulateSwap = query
     'to-asset': '(Asset / AssetInfo) asset to swap into, e.g. uusd, MIR',
   })
   .option('--reverse', 'Reverse simulation (calculate from-asset)')
-  .action((fromAsset: string, toAsset: string) => {
-    handleQueryCommand(query, mirror => {
+  .action(async (fromAsset: string, toAsset: string) => {
+    await handleQueryCommand(query, mirror => {
       if (getSimulateSwap.reverse) {
         const askDenom = Coin.fromString(toAsset).denom;
         const pair = lookupPair(mirror, fromAsset, askDenom);

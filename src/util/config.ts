@@ -46,10 +46,10 @@ export interface MirrorCLINetworkConfig {
     mint: AccAddress;
     oracle: AccAddress;
     staking: AccAddress;
-    'mirror-token': AccAddress;
     terraswap: AccAddress;
   };
   assets: {
+    MIR: AssetConfig;
     [symbol: string]: AssetConfig;
   };
 }

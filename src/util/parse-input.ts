@@ -20,9 +20,7 @@ export namespace Parse {
   }
 
   export function accAddress(input?: string): AccAddress {
-    {
-      if (input === undefined) return undefined;
-    }
+    if (input === undefined) return undefined;
 
     if (!AccAddress.validate(input)) {
       throw new Error(`Invalid Terra account address: ${input}`);
@@ -90,6 +88,10 @@ export namespace Parse {
   }
 
   export function assetTokenAddress(input?: string): AccAddress {
+    if (input === undefined) {
+      return undefined;
+    }
+
     return (asset(input) as Asset<Token>).info.token.contract_addr;
   }
 

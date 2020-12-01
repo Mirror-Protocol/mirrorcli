@@ -81,6 +81,8 @@ const send = exec
         Parse.accAddress(contract),
         Parse.asset(asset).amount,
         send.msg
+          ? Buffer.from(JSON.stringify(JSON.parse(send.msg))).toString('base64')
+          : undefined
       )
     );
   });
@@ -103,6 +105,10 @@ const sendFrom = exec
         Parse.accAddress(contract),
         Parse.asset(asset).amount,
         sendFrom.msg
+          ? Buffer.from(JSON.stringify(JSON.parse(sendFrom.msg))).toString(
+              'base64'
+            )
+          : undefined
       )
     );
   });
@@ -157,11 +163,43 @@ const increaseAllowance = exec
   })
   .option('--expiry-height <int>', 'block height expiration of allowance')
   .option('--expiry-time <int>', 'time expiration of allowance (seconds)')
+  .option('--expiry-never', 'never expires')
   .action(async (spender: string, asset: string) => {
+    let expiry: TerraswapToken.Expiration;
+    if (
+      +!!increaseAllowance.expiryHeight +
+        +!!increaseAllowance.expiryTime +
+        +!!increaseAllowance.expiryNever >=
+      2
+    ) {
+      throw new Error(
+        `can only use one option of --expiry-height, --expiry-time, --expiry-never`
+      );
+    }
+
+    if (increaseAllowance.expiryHeight) {
+      expiry = {
+        at_height: Parse.int(increaseAllowance.expiryHeight),
+      };
+    }
+
+    if (increaseAllowance.expiryTime) {
+      expiry = {
+        at_time: Parse.int(increaseAllowance.expiryTime),
+      };
+    }
+
+    if (increaseAllowance.expiryNever) {
+      expiry = {
+        never: {},
+      };
+    }
+
     await handleExecCommand(exec, mirror =>
       lookupTokenByAsset(mirror, asset).increaseAllowance(
         Parse.accAddress(spender),
-        Parse.asset(asset).amount
+        Parse.asset(asset).amount,
+        expiry
       )
     );
   });
@@ -174,11 +212,43 @@ const decreaseAllowance = exec
   })
   .option('--expiry-height <int>', 'block height expiration of allowance')
   .option('--expiry-time <int>', 'time expiration of allowance (seconds)')
-  .action((spender: string, asset: string) => {
-    handleExecCommand(exec, mirror =>
+  .option('--expiry-never', 'never expires')
+  .action(async (spender: string, asset: string) => {
+    let expiry: TerraswapToken.Expiration;
+    if (
+      +!!decreaseAllowance.expiryHeight +
+        +!!decreaseAllowance.expiryTime +
+        +!!decreaseAllowance.expiryNever >=
+      2
+    ) {
+      throw new Error(
+        `can only use one option of --expiry-height, --expiry-time, --expiry-never`
+      );
+    }
+
+    if (decreaseAllowance.expiryHeight) {
+      expiry = {
+        at_height: Parse.int(decreaseAllowance.expiryHeight),
+      };
+    }
+
+    if (decreaseAllowance.expiryTime) {
+      expiry = {
+        at_time: Parse.int(decreaseAllowance.expiryTime),
+      };
+    }
+
+    if (decreaseAllowance.expiryNever) {
+      expiry = {
+        never: {},
+      };
+    }
+
+    await handleExecCommand(exec, mirror =>
       lookupTokenByAsset(mirror, asset).decreaseAllowance(
         Parse.accAddress(spender),
-        Parse.asset(asset).amount
+        Parse.asset(asset).amount,
+        expiry
       )
     );
   });

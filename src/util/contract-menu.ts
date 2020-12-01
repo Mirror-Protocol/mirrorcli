@@ -26,11 +26,16 @@ export function createExecMenu(
     .option('--yaml', 'Encode result as YAML instead of JSON')
     .option('-y,--yes', 'Sign transaction without confirming (yes)')
     .option('--home <string>', 'Directory for config of terracli')
-    .requiredOption('--from <string>', '*Name of key in terracli keyring')
+    .option('--from <key-name>', '*Name of key in terracli keyring')
     .option(
       '--generate-only',
       'Build an unsigned transaction and write it to stdout'
     )
+    .option(
+      '-G,--generate-msg',
+      'Build an ExecuteMsg (good for including in poll)'
+    )
+    .option('--base64', 'For --generate-msg: returns msg as base64')
     .option(
       '-b,--broadcast-mode <string>',
       'Transaction broadcasting mode (sync|async|block) (default: sync)',
@@ -49,7 +54,7 @@ export function createExecMenu(
     .option('--memo <string>', 'Memo to send along with transaction')
     // Fees & Gas
     .option('--fees <coins>', 'Fees to pay along with transaction')
-    .requiredOption(
+    .option(
       '--gas <int|auto>',
       '*Gas limit to set per-transaction; set to "auto" to calculate required gas automatically'
     )
@@ -78,11 +83,36 @@ export function createQueryMenu(
 
 export async function handleExecCommand(
   exec: commander.Command,
-  createMsg: (mirror: Mirror) => Msg
+  createMsg: (mirror: Mirror) => MsgExecuteContract
 ) {
+  if (!exec.generateMsg) {
+    if (exec.from === undefined) {
+      throw new Error(
+        `--from <key-name> must be provided if not --generate-msg`
+      );
+    }
+
+    if (exec.gas === undefined) {
+      throw new Error(
+        `--gas <int|auto> must be provided if not --generate-msg`
+      );
+    }
+  }
+
   const mirror = getMirrorClient(exec.from, exec.home);
   const wallet = mirror.lcd.wallet(mirror.key);
   const msgs = [createMsg(mirror)];
+
+  if (exec.generateMsg) {
+    if (exec.base64) {
+      return console.log(
+        Buffer.from(JSON.stringify(createMsg(mirror).execute_msg)).toString(
+          'base64'
+        )
+      );
+    }
+    return console.log(JSON.stringify(createMsg(mirror).execute_msg));
+  }
 
   const chainId: string = exec.chainId
     ? exec.chainId

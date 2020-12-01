@@ -11,6 +11,36 @@ import {
 
 const exec = createExecMenu('gov', 'Mirror Gov contract functions');
 
+const updateConfig = exec
+  .command('update-config')
+  .description(`Update Mirror Gov config`)
+  .option('--owner <AccAddress>', 'New owner address')
+  .option('--effective-delay <int>', 'New effective delay')
+  .option('--expiration-period <int>', 'New expiration period')
+  .option('--proposal-deposit <Uint128>', 'New min proposal deposit')
+  .option('--quorum <dec>', 'New quorum %')
+  .option('--threshold <dec>', 'New threshold %')
+  .option('--voting-period <int>', 'New voting period (sec)')
+  .action(() => {
+    handleExecCommand(exec, mirror =>
+      mirror.gov.updateConfig({
+        owner: Parse.accAddress(updateConfig.owner),
+        effective_delay: Parse.int(updateConfig.effectiveDelay),
+        expiration_period: Parse.int(updateConfig.expirationPeriod),
+        proposal_deposit: updateConfig.proposalDeposit
+          ? Parse.uint128(updateConfig.proposalDeposit).toString()
+          : undefined,
+        quorum: updateConfig.quorum
+          ? Parse.dec(updateConfig.quorum).toString()
+          : undefined,
+        threshold: updateConfig.threshold
+          ? Parse.dec(updateConfig.threshold).toString()
+          : undefined,
+        voting_period: Parse.int(updateConfig.votingPeriod),
+      })
+    );
+  });
+
 const castVote = exec
   .command('cast-vote <poll-id> <vote-option> <amount>')
   .description(`Vote in an active poll`, {
@@ -89,6 +119,15 @@ const endPoll = exec
   })
   .action((pollId: string) => {
     handleExecCommand(exec, mirror => mirror.gov.endPoll(Parse.int(pollId)));
+  });
+
+const expirePoll = exec
+  .command('expire-poll <poll-id>')
+  .description(`Expires a poll`, {
+    pollId: '(int) poll id',
+  })
+  .action((pollId: string) => {
+    handleExecCommand(exec, mirror => mirror.gov.expirePoll(Parse.int(pollId)));
   });
 
 const stake = exec

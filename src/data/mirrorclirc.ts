@@ -25,7 +25,6 @@ const defaultConfig: {
         mint: 'terra1s9ehcjv0dqj2gsl72xrpp0ga5fql7fj7y3kq3w',
         oracle: 'terra1uvxhec74deupp47enh7z5pk55f3cvcz8nj4ww9',
         staking: 'terra1a06dgl27rhujjphsn4drl242ufws267qxypptx',
-        'mirror-token': 'terra10llyp6v3j3her8u3ce66ragytu45kcmd9asj3u',
         terraswap: 'terra1ulgw0td86nvs4wtpsc80thv6xelk76ut7a7apj',
       },
       assets: {
@@ -137,11 +136,12 @@ const defaultConfig: {
         mint: 'terra1ycsd7mlffq2ksmqdr20y4drtf6ctw3n8fmup5g',
         oracle: 'terra14nh9jzg6gx3qp2jnlg5lvkmky40uxu7w9mgevz',
         staking: 'terra1xxqqw7vysmh2wnq3y6hgh7d2ytmgazw62f28hh',
-        'mirror-token': 'terra16y2ew6rmnehu9fn45jj55w4g37d62xgjz8zsx9',
         terraswap: 'terra1ulgw0td86nvs4wtpsc80thv6xelk76ut7a7apj',
       },
 
-      assets: {},
+      assets: {
+        MIR: undefined,
+      },
     },
   },
 };

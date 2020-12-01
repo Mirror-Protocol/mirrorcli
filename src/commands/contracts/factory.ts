@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-
 import { Parse } from '../../util/parse-input';
 import {
   createExecMenu,
