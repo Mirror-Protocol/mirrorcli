@@ -7,12 +7,11 @@ import {
 } from '../../util/contract-menu';
 import {
   Mirror,
-  TerraswapFactory,
   TerraswapPair,
   TerraswapToken,
   AssetInfo,
 } from '@mirror-protocol/mirror.js';
-import { config } from '../../util/config';
+import { lookupAssetBySymbol } from '../../util/config';
 import { Coin } from '@terra-money/terra.js';
 
 const exec = createExecMenu('Terraswap', 'Terraswap contract functions');
@@ -68,9 +67,9 @@ export function lookupPair(
   }
 
   if (fromAsset === 'uusd') {
-    contractAddress = config.assets[toAsset].pair;
+    contractAddress = lookupAssetBySymbol(toAsset).pair;
   } else {
-    contractAddress = config.assets[fromAsset].pair;
+    contractAddress = lookupAssetBySymbol(fromAsset).pair;
   }
 
   return new TerraswapPair({
@@ -116,8 +115,8 @@ const provideLiquidity = exec
   })
   .action((asset1: string, asset2: string) => {
     handleExecCommand(exec, mirror => {
-      let denom1 = Coin.fromString(asset1).denom;
-      let denom2 = Coin.fromString(asset2).denom;
+      const denom1 = Coin.fromString(asset1).denom;
+      const denom2 = Coin.fromString(asset2).denom;
       const pair = lookupPair(mirror, denom1, denom2);
       return pair.provideLiquidity([Parse.asset(asset1), Parse.asset(asset2)]);
     });
@@ -134,7 +133,7 @@ const withdrawLiquidity = exec
     await handleExecCommand(exec, mirror => {
       const pair = lookupPair(mirror, assetInfo, 'uusd');
       const lpToken = new TerraswapToken({
-        contractAddress: config.assets[assetInfo].lpToken,
+        contractAddress: lookupAssetBySymbol(assetInfo).lpToken,
         lcd: mirror.lcd,
         key: mirror.key,
       });

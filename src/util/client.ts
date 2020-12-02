@@ -4,7 +4,7 @@ import { CLIKey } from '@terra-money/terra.js/dist/key/CLIKey';
 
 import * as _ from 'lodash';
 
-import { config } from './config';
+import { config, lookupAssetBySymbol } from './config';
 
 export function getLCDClient(): LCDClient {
   return new LCDClient({
@@ -26,7 +26,7 @@ export function getMirrorClient(keyName?: string, home?: string): Mirror {
     mint: config.contracts.mint,
     oracle: config.contracts.oracle,
     staking: config.contracts.staking,
-    mirrorToken: config.assets['MIR'].token,
+    mirrorToken: lookupAssetBySymbol('MIR').token,
     terraswapFactory: config.contracts['terraswap'],
     assets: _.map(config.assets, (asset, symbol) => ({
       symbol,

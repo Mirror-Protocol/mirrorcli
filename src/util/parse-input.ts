@@ -2,7 +2,13 @@ import { Asset, AssetInfo, Token } from '@mirror-protocol/mirror.js';
 import { AccAddress, Coins, Dec, Int } from '@terra-money/terra.js';
 import * as _ from 'lodash';
 
-import { config, AssetConfig, activeNetwork, configFilePath } from './config';
+import {
+  config,
+  AssetConfig,
+  activeNetwork,
+  configFilePath,
+  lookupAssetBySymbol,
+} from './config';
 
 export type InputParser<T> = (input?: string) => T;
 
@@ -34,13 +40,13 @@ export namespace Parse {
       return undefined;
     }
 
-    if (config.assets[input] === undefined) {
+    if (lookupAssetBySymbol(input) === undefined) {
       throw new Error(
         `Asset '${input}' not found in registry; please add info to networks[${activeNetwork}][assets][${input}] in ${configFilePath}`
       );
     }
 
-    return config.assets[input];
+    return lookupAssetBySymbol(input);
   }
 
   export function prices(
@@ -116,7 +122,7 @@ export namespace Parse {
         },
         amount: matches[1],
       };
-    } else if (config.assets[matches[2]] !== undefined) {
+    } else if (lookupAssetBySymbol(matches[2]) !== undefined) {
       return {
         info: {
           token: {

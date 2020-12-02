@@ -22,10 +22,12 @@ export namespace MirrorCLIConfig {
 }
 
 export interface AssetConfig {
+  symbol: string;
   name: string;
   token: AccAddress;
   pair: AccAddress;
   lpToken: AccAddress;
+  status: 'LISTED';
 }
 
 export interface MirrorCLINetworkConfig {
@@ -49,8 +51,7 @@ export interface MirrorCLINetworkConfig {
     terraswap: AccAddress;
   };
   assets: {
-    MIR: AssetConfig;
-    [symbol: string]: AssetConfig;
+    [address: string]: AssetConfig;
   };
 }
 
@@ -122,3 +123,12 @@ export const config = (() => {
     process.exit();
   }
 })();
+
+export function lookupAssetBySymbol(symbol: string): AssetConfig {
+  for (const tokenAddress of Object.keys(config.assets)) {
+    if (config.assets[tokenAddress].symbol === symbol) {
+      return config.assets[tokenAddress];
+    }
+  }
+  return undefined;
+}
