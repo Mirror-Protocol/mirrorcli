@@ -79,7 +79,7 @@ const withdraw = exec
   });
 
 const depositReward = exec
-  .command('deposit-reward <asset-token>')
+  .command('deposit-reward <asset-token> <amount>')
   .description(`Adds MIR tokens to the rewards for the asset's staking pool`, {
     'asset-token': '(symbol / AccAddress) address of staking pool to reward',
     amount: '(Uint128) amount of MIR token to deposit',
