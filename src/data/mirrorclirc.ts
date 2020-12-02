@@ -167,9 +167,7 @@ const defaultConfig: {
         terraswap: 'terra1ulgw0td86nvs4wtpsc80thv6xelk76ut7a7apj',
       },
 
-      assets: {
-        MIR: undefined,
-      },
+      assets: {},
     },
   },
 };

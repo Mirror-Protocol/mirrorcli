@@ -31,10 +31,10 @@ const updateConfig = exec
           ? Parse.uint128(updateConfig.proposalDeposit).toString()
           : undefined,
         quorum: updateConfig.quorum
-          ? Parse.dec(updateConfig.quorum).toString()
+          ? Parse.dec(updateConfig.quorum).toFixed()
           : undefined,
         threshold: updateConfig.threshold
-          ? Parse.dec(updateConfig.threshold).toString()
+          ? Parse.dec(updateConfig.threshold).toFixed()
           : undefined,
         voting_period: Parse.int(updateConfig.votingPeriod),
       })

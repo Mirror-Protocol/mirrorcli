@@ -27,7 +27,7 @@ export interface AssetConfig {
   token: AccAddress;
   pair: AccAddress;
   lpToken: AccAddress;
-  status: 'LISTED';
+  status: 'LISTED' | 'DELISTED';
 }
 
 export interface MirrorCLINetworkConfig {
@@ -126,9 +126,14 @@ export const config = (() => {
 
 export function lookupAssetBySymbol(symbol: string): AssetConfig {
   for (const tokenAddress of Object.keys(config.assets)) {
-    if (config.assets[tokenAddress].symbol === symbol) {
+    if (
+      config.assets[tokenAddress].symbol === symbol &&
+      config.assets[tokenAddress].status === 'LISTED'
+    ) {
       return config.assets[tokenAddress];
     }
   }
-  return undefined;
+  throw new Error(
+    `couldn't find ${symbol} in ${configFilePath}; add entry to networks['${activeNetwork}']['assets']`
+  );
 }

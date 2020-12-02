@@ -13,8 +13,9 @@ import {
 } from '@mirror-protocol/mirror.js';
 import { lookupAssetBySymbol } from '../../util/config';
 import { Coin } from '@terra-money/terra.js';
+import { lookupTokenByAsset } from './token';
 
-const exec = createExecMenu('Terraswap', 'Terraswap contract functions');
+const exec = createExecMenu('terraswap', 'Terraswap contract functions');
 exec.alias('ts');
 
 // factory
@@ -98,11 +99,13 @@ const swap = exec
     await handleExecCommand(exec, mirror => {
       const offer = Coin.fromString(fromAsset);
       const pair = lookupPair(mirror, offer.denom, toAssetInfo);
-
       return pair.swap(Parse.asset(fromAsset), {
         belief_price: Parse.dec(swap.beliefPrice),
         max_spread: Parse.dec(swap.maxSpread),
         to: Parse.accAddress(swap.sendTo),
+        offer_token: offer.denom.startsWith('u')
+          ? undefined
+          : lookupTokenByAsset(mirror, fromAsset),
       });
     });
   });

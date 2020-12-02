@@ -28,12 +28,5 @@ export function getMirrorClient(keyName?: string, home?: string): Mirror {
     staking: config.contracts.staking,
     mirrorToken: lookupAssetBySymbol('MIR').token,
     terraswapFactory: config.contracts['terraswap'],
-    assets: _.map(config.assets, (asset, symbol) => ({
-      symbol,
-      name: asset.name,
-      token: asset.token,
-      pair: asset.pair,
-      lpToken: asset.lpToken,
-    })),
   });
 }
