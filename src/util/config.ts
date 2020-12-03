@@ -4,7 +4,6 @@ import * as path from 'path';
 import { AccAddress } from '@terra-money/terra.js';
 
 import { Validator } from 'jsonschema';
-import * as _ from 'lodash';
 
 import * as logger from './logger';
 
@@ -78,10 +77,23 @@ export function validateConfig(
   }
 }
 
-export function saveConfig(config: DeepPartial<MirrorCLIConfig>) {
+export function saveConfig(newConfig: DeepPartial<MirrorCLIConfig>) {
   fs.writeFileSync(
     configFilePath,
-    JSON.stringify(validateConfig(config), null, 2)
+    JSON.stringify(validateConfig(newConfig), null, 2)
+  );
+}
+
+/**
+ * Saves the netork-specific configuration to config file.
+ * @param newNetworkConfig
+ */
+export function saveNetworkConfig(newNetworkConfig: MirrorCLINetworkConfig) {
+  const cfg = loadConfig();
+  cfg['networks'][activeNetwork] = newNetworkConfig;
+  fs.writeFileSync(
+    configFilePath,
+    JSON.stringify(validateConfig(cfg), null, 2)
   );
 }
 
@@ -134,6 +146,6 @@ export function lookupAssetBySymbol(symbol: string): AssetConfig {
     }
   }
   throw new Error(
-    `couldn't find ${symbol} in ${configFilePath}; add entry to networks['${activeNetwork}']['assets']`
+    `couldn't find ${symbol} with LISTED status in ${configFilePath}; add entry to networks['${activeNetwork}']['assets']`
   );
 }
