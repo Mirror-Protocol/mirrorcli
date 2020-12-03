@@ -208,15 +208,21 @@ Commands:
 
 This section illustrates the usage of `mirrorcli` through some use cases. All examples assume you have a key in `terracli` keychain called `test1`.
 
-### Partial withdrawal of collateral from CDP
+### Adjusting CDP collateral ratio via mint / burn
 
-The Mirror Web App requires you to fully close your position to withdraw your collateral. You can do a partial withdrawal to adjust your collateralization ratio by:
+The Mirror Web App currently requires you to open a new position if you want to mint more mAssets, and burn all your minted tokens and close your position completely. You can do additional mint / burn operations against an existing position to adjust your collateralization ratio by:
+
+#### Minting
 
 ```sh
-mirrorcli x mint $POSITION_ID 10000000mAAPL --from test1 --gas auto --fees 100000uluna --b block
+mirrorcli x mint mint $POSITION_ID 10000000mAAPL --from test1 --gas auto --fees 100000uluna --b block
 ```
 
-Note that this operation will incur the protocol withdrawal fee.
+#### Burning
+
+```sh
+mirrorcli x mint burn $POSITION_ID 10000000mAAPL --from test1 --gas auto --fees 100000uluna --b block
+```
 
 ### Creating a new poll
 
