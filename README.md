@@ -1,4 +1,4 @@
-# mirrorcli <!-- omit in toc -->
+# `mirrorcli` <!-- omit in toc -->
 
 Command-line interface for Mirror Protocol on Terra.
 
@@ -6,7 +6,10 @@ Command-line interface for Mirror Protocol on Terra.
 
 - [Installation](#installation)
 - [Configuration](#configuration)
-  - [Specifying which chain to use [IMPORTANT]](#specifying-which-chain-to-use-important)
+  - [Specifying LCD settings](#specifying-lcd-settings)
+  - [Specifying Contracts](#specifying-contracts)
+  - [Specifying the Assets](#specifying-the-assets)
+  - [Specify the Network [IMPORTANT]](#specify-the-network-important)
 - [Usage](#usage)
   - [Execute](#execute)
   - [Query](#query)
@@ -51,23 +54,82 @@ The entrypoint `mirrorcli` should then be available in your `path`:
 
 ## Configuration
 
+On first launch, `mirrorcli` will generate a `~/.mirrorclirc.json` in your `$HOME` directory, which will be used in subsequent sessions to specify settings such as LCD provider, gas prices for fee estimation, as well as contract addresses. It will come pre-configured with the official contracts for the mainnet version of Mirror on its `columbus-4` setting.
+
+The following instructions show you how to modify settings using the `tequila-0004` network by default:
+
 `mirrorcli` will create a configuration file in your home directory: `$HOME/.mirrorclirc.json`.
 
-### Specifying which chain to use [IMPORTANT]
+### Specifying LCD settings
 
-By default, `mirrorcli` will use the `columbus-4` (Terra mainnet) configuration. In order to change the chain, set the `MIRRORCLI_NETWORK` environment variable to the desired chain ID.
+Each network config should define how to connect to the Terra blockchain via LCD parameters.
 
-For example, to use on the official testnet `tequila-0004`:
-
-```sh
-$ MIRRORCLI_NETWORK=tequila-0004 mirrorcli x mint [deposit ...]
+```js
+{
+  "networks": {
+    "tequila-0004": {
+      "lcd": {
+        "chainId": "tequila-0004",
+        "url": "https://tequila-lcd.terra.dev",
+        "gasPrices": {
+          "uluna": 0.15,
+          "usdr": 0.1018,
+          "uusd": 0.15,
+          "ukrw": 178.05,
+          "umnt": 431.6259
+        },
+        "gasAdjustment": 1.2
+      },
+      ...
+    }
+  }
+}
 ```
 
-OR:
+### Specifying Contracts
+
+Each network configuration should point to the correct Mirror core contract addresses.
+
+```js
+{
+  "networks": {
+    "tequila-0004": {
+      ...
+      "contracts": {
+        "collector": "terra1v046ktavwzlyct5gh8ls767fh7hc4gxc95grxy",
+        "community": "terra10qm80sfht0zhh3gaeej7sd4f92tswc44fn000q",
+        "factory": "terra10l9xc9eyrpxd5tqjgy6uxrw7dd9cv897cw8wdr",
+        "gov": "terra12r5ghc6ppewcdcs3hkewrz24ey6xl7mmpk478s",
+        "mint": "terra1s9ehcjv0dqj2gsl72xrpp0ga5fql7fj7y3kq3w",
+        "oracle": "terra1uvxhec74deupp47enh7z5pk55f3cvcz8nj4ww9",
+        "staking": "terra1a06dgl27rhujjphsn4drl242ufws267qxypptx",
+        "terraswap": "terra18qpjm4zkvqnpjpw0zn0tdr8gdzvt8au35v45xf"
+      },
+    ...
+    }
+  }
+}
+```
+
+### Specifying the Assets
+
+`mirrorcli` takes
+
+### Specify the Network [IMPORTANT]
+
+By default, `mirrorcli` will use the network setting for `columbus-4` configured in `~/.mirrorclirc.json`. You can direct `mirrorcli` to use a different network configuration by changing the value of the `MIRRORCLI_NETWORK` environment variable.
+
+#### Example
 
 ```sh
-$ export MIRRORCLI_NETWORK=tequila-0004
-$ mirrorcli x mint [deposit ...]
+MIRRORCLI_NETWORK=tequila-0004 mirrorcli x mint [deposit ...]
+```
+
+OR
+
+```sh
+export MIRRORCLI_NETWORK=tequila-0004
+mirrorcli x mint [deposit ...]
 ```
 
 ## Usage
