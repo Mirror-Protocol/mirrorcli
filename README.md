@@ -13,6 +13,9 @@ Command-line interface for Mirror Protocol on Terra.
 - [Usage](#usage)
   - [Execute](#execute)
   - [Query](#query)
+- [Examples](#examples)
+  - [Partial withdrawal of collateral from CDP](#partial-withdrawal-of-collateral-from-cdp)
+  - [Creating a new poll](#creating-a-new-poll)
 - [License](#license)
 
 ## Installation
@@ -147,7 +150,23 @@ mirrorcli x mint [deposit ...]
 Execute a function on a smart contract
 
 Options:
-  -h, --help              display help for command
+  --yaml                                        Encode result as YAML instead of JSON
+  -y,--yes                                      Sign transaction without confirming (yes)
+  --home <string>                               Directory for config of terracli
+  --from <key-name>                             *Name of key in terracli keyring
+  --generate-only                               Build an unsigned transaction and write it to stdout
+  -G,--generate-msg                             Build an ExecuteMsg (good for including in poll)
+  --base64                                      For --generate-msg: returns msg as base64
+  -b,--broadcast-mode <string>                  Transaction broadcasting mode (sync|async|block) (default: sync) (default: "sync")
+  --chain-id <string>                           Chain ID of Terra node
+  -a,--account-number <int>                     The account number of the signing account (offline mode)
+  -s,--sequence <int>                           The sequence number of the signing account (offline mode)
+  --memo <string>                               Memo to send along with transaction
+  --fees <coins>                                Fees to pay along with transaction
+  --gas <int|auto>                              *Gas limit to set per-transaction; set to "auto" to calculate required gas automatically
+  --gas-adjustment <float>                      Adjustment factor to be multiplied against the estimate returned by the tx simulation
+  --gas-prices <coins>                          Gas prices to determine the transaction fee (e.g. 10uluna,12.5ukrw)
+  -h, --help                                    display help for command
 
 Commands:
   collector [options]     Mirror Collector contract functions
@@ -184,6 +203,41 @@ Commands:
   token [options]         Terraswap CW20 Token contract queries
   help [command]          display help for command
 ```
+
+## Examples
+
+This section illustrates the usage of `mirrorcli` through some use cases. All examples assume you have a key in `terracli` keychain called `test1`.
+
+### Partial withdrawal of collateral from CDP
+
+The Mirror Web App requires you to fully close your position to withdraw your collateral. You can do a partial withdrawal to adjust your collateralization ratio by:
+
+```sh
+mirrorcli x mint $POSITION_ID 10000000mAAPL --from test1 --gas auto --fees 100000uluna --b block
+```
+
+Note that this operation will incur the protocol withdrawal fee.
+
+### Creating a new poll
+
+The following create a community-pool spend poll:
+
+```sh
+export RECIPIENT=terra1...
+mirrorcli x gov create-poll \
+  --title 'Community pool spend' \
+  --desc 'Spends some funds from community' \
+  --deposit 512000000 \
+  --link 'https://link.to/more-details' \
+  --execute-to $(mirrorcli c get contracts.community) \
+  --execute-msg $(mirrorcli x community spend $RECIPIENT 100000 -G) \
+  --from test1 \
+  --gas 500000 \
+  --fees 20000000uluna \
+  -b block
+```
+
+Note how the output of `$(mirrorcli x community spend $RECIPIENT 100000 -G)` is used to generate a Mirror message which can be used inside other `mirrorcli` functions that accept messages.
 
 ## License
 
