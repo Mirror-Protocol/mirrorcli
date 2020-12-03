@@ -1,6 +1,6 @@
 {
-  "name": "mirrorcli",
-  "version": "0.0.1",
+  "name": "@mirror-protocol/mirrorcli",
+  "version": "0.1.0",
   "description": "Command-line interface for Mirror Protocol",
   "main": "dist/bundle.node.js",
   "typings": "dist/index.d.ts",
