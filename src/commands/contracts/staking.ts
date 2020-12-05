@@ -15,8 +15,8 @@ const registerAsset = exec
     'asset-token': '(symbol / AccAddress) mAsset or MIR token',
     'staking-token': '(AccAddress) Associated LP token',
   })
-  .action((assetToken: string, stakingToken: string) => {
-    handleExecCommand(exec, mirror =>
+  .action(async (assetToken: string, stakingToken: string) => {
+    await handleExecCommand(exec, async mirror =>
       mirror.staking.registerAsset(
         Parse.assetTokenOrAccAddress(assetToken),
         Parse.accAddress(stakingToken)
@@ -28,8 +28,8 @@ const updateConfig = exec
   .command('update-config')
   .option('--owner <string>', 'New owner address')
   .description('Update Mirror Staking contract config')
-  .action(() => {
-    handleExecCommand(exec, mirror =>
+  .action(async () => {
+    await handleExecCommand(exec, async mirror =>
       mirror.staking.updateConfig({
         // owner: updateConfig.owner,
       })
@@ -43,8 +43,8 @@ const bond = exec
     amount: '(Uint128) amount of LP token to bond',
     'lp-token': '(AccAddress) LP Token address',
   })
-  .action((assetToken: string, amount: string, lpToken?: string) => {
-    handleExecCommand(exec, mirror => {
+  .action(async (assetToken: string, amount: string, lpToken?: string) => {
+    await handleExecCommand(exec, async mirror => {
       let lpTokenInstance;
       if (lpToken !== undefined) {
         lpTokenInstance = new TerraswapToken({
@@ -72,8 +72,8 @@ const withdraw = exec
   .description('Withdraw asset from Mirror Staking contract', {
     'asset-token': '(symbol / AccAddress) mAsset or MIR token',
   })
-  .action((assetToken: string) => {
-    handleExecCommand(exec, mirror =>
+  .action(async (assetToken: string) => {
+    await handleExecCommand(exec, async mirror =>
       mirror.staking.withdraw(Parse.assetTokenOrAccAddress(assetToken))
     );
   });
@@ -84,14 +84,14 @@ const depositReward = exec
     'asset-token': '(symbol / AccAddress) address of staking pool to reward',
     amount: '(Uint128) amount of MIR token to deposit',
   })
-  .action((assetToken: string, amount: string) => {
-    handleExecCommand(exec, mirror => {
-      return mirror.staking.depositReward(
+  .action(async (assetToken: string, amount: string) => {
+    await handleExecCommand(exec, async mirror =>
+      mirror.staking.depositReward(
         Parse.assetTokenOrAccAddress(assetToken),
         Parse.uint128(amount),
         mirror.mirrorToken
-      );
-    });
+      )
+    );
   });
 
 const unbond = exec
@@ -100,8 +100,8 @@ const unbond = exec
     'asset-token': '(symbol / AccAddress) mAsset or MIR token',
     amount: '(Uint128) amount of LP tokens to unbond',
   })
-  .action((assetToken: string, amount: string) => {
-    handleExecCommand(exec, mirror =>
+  .action(async (assetToken: string, amount: string) => {
+    await handleExecCommand(exec, async mirror =>
       mirror.staking.unbond(Parse.assetTokenOrAccAddress(assetToken), amount)
     );
   });
@@ -110,8 +110,8 @@ const query = createQueryMenu('staking', 'Mirror Staking contract queries');
 const getConfig = query
   .command('config')
   .description('Query Mirror Staking contract config')
-  .action(() => {
-    handleQueryCommand(query, mirror => mirror.staking.getConfig());
+  .action(async () => {
+    await handleQueryCommand(query, async mirror => mirror.staking.getConfig());
   });
 
 const getPoolInfo = query
@@ -119,8 +119,8 @@ const getPoolInfo = query
   .description('Query Mirror Staking pool info', {
     'asset-token': '(symbol / AccAddress) mAsset or MIR token',
   })
-  .action((assetToken: string) => {
-    handleQueryCommand(query, mirror =>
+  .action(async (assetToken: string) => {
+    await handleQueryCommand(query, async mirror =>
       mirror.staking.getPoolInfo(Parse.assetTokenOrAccAddress(assetToken))
     );
   });
@@ -132,8 +132,8 @@ const getRewardInfo = query
     'asset-token':
       '(symbol / AccAddress) mAsset or MIR token. If empty, returns all rewards.',
   })
-  .action((staker: string, assetToken?: string) => {
-    handleQueryCommand(query, mirror =>
+  .action(async (staker: string, assetToken?: string) => {
+    await handleQueryCommand(query, async mirror =>
       mirror.staking.getRewardInfo(
         staker,
         Parse.assetTokenOrAccAddress(assetToken)

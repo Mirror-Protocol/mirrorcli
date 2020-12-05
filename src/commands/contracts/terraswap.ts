@@ -26,8 +26,8 @@ exec.alias('ts');
 //   .option('--owner <AccAddress>', 'New contract owner')
 //   .option('--pair-code-id <int>', 'New pair code ID')
 //   .option('--token-code-id <int>', 'New token code ID')
-//   .action(() => {
-//     handleExecCommand(exec, mirror =>
+//   .action(async () => {
+//     handleExecCommand(exec, async mirror =>
 //       mirror.terraswapFactory.updateConfig({
 //         owner: Parse.accAddress(updateConfig.owner),
 //         pair_code_id: Parse.int(updateConfig.pairCodeId),
@@ -40,13 +40,13 @@ exec.alias('ts');
 //   .command('create-pair <asset1> <asset2>')
 //   .description(`Create new Terraswap pair`)
 //   .option('--hook <json>', 'hook message to attach')
-//   .action((asset1: string, asset2: string) => {
+//   .action(async (asset1: string, asset2: string) => {
 //     let hook: any;
 //     if (createPair.hook) {
 //       hook = JSON.parse(createPair.hook);
 //     }
 
-//     handleExecCommand(exec, mirror =>
+//     handleExecCommand(exec, async mirror =>
 //       mirror.terraswapFactory.createPair(
 //         [Parse.assetInfo(asset1), Parse.assetInfo(asset2)],
 //         hook as TerraswapFactory.InitHook
@@ -96,7 +96,7 @@ const swap = exec
   )
   .option('--send-to <string>', 'Account to send swapped funds to')
   .action(async (fromAsset: string, toAssetInfo: string) => {
-    await handleExecCommand(exec, mirror => {
+    await handleExecCommand(exec, async mirror => {
       const offer = Coin.fromString(fromAsset);
       const pair = lookupPair(mirror, offer.denom, toAssetInfo);
       return pair.swap(Parse.asset(fromAsset), {
@@ -116,8 +116,8 @@ const provideLiquidity = exec
     asset1: '(Asset) first side of liquidity pool e.g. 1000mAAPL',
     asset2: '(Asset) second side of liquidity pool e.g. 1000uusd',
   })
-  .action((asset1: string, asset2: string) => {
-    handleExecCommand(exec, mirror => {
+  .action(async (asset1: string, asset2: string) => {
+    await handleExecCommand(exec, async mirror => {
       const denom1 = Coin.fromString(asset1).denom;
       const denom2 = Coin.fromString(asset2).denom;
       const pair = lookupPair(mirror, denom1, denom2);
@@ -133,7 +133,7 @@ const withdrawLiquidity = exec
     amount: '(Uint128) amount of LP tokens to burn',
   })
   .action(async (assetInfo: string, amount: string) => {
-    await handleExecCommand(exec, mirror => {
+    await handleExecCommand(exec, async mirror => {
       const pair = lookupPair(mirror, assetInfo, 'uusd');
       const lpToken = new TerraswapToken({
         contractAddress: lookupAssetBySymbol(assetInfo).lpToken,
@@ -150,7 +150,7 @@ const getConfig = query
   .command('config')
   .description('Query Terraswap Factory contract config')
   .action(async () => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       mirror.terraswapFactory.getConfig()
     );
   });
@@ -162,7 +162,7 @@ const getPair = query
     asset2: '(symbol / AccAddress / uusd) native coin or CW20 address',
   })
   .action(async (asset1: string, asset2: string) => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       mirror.terraswapFactory.getPair([
         Parse.assetInfo(asset1),
         Parse.assetInfo(asset2),
@@ -179,7 +179,7 @@ const getPairs = query
   )
   .option('--limit <int>', 'max results to return')
   .action(async () => {
-    await handleQueryCommand(query, mirror => {
+    await handleQueryCommand(query, async mirror => {
       let startAfter: [AssetInfo, AssetInfo];
       if (getPairs.startAfter !== undefined) {
         const c = getPairs.startAfter.split('/');
@@ -201,7 +201,7 @@ const getSimulateSwap = query
   })
   .option('--reverse', 'Reverse simulation (calculate from-asset)')
   .action(async (fromAsset: string, toAsset: string) => {
-    await handleQueryCommand(query, mirror => {
+    await handleQueryCommand(query, async mirror => {
       if (getSimulateSwap.reverse) {
         const askDenom = Coin.fromString(toAsset).denom;
         const pair = lookupPair(mirror, fromAsset, askDenom);

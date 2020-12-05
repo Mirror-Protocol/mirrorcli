@@ -83,7 +83,7 @@ export function createQueryMenu(
 
 export async function handleExecCommand(
   exec: commander.Command,
-  createMsg: (mirror: Mirror) => MsgExecuteContract
+  createMsg: (mirror: Mirror) => Promise<MsgExecuteContract>
 ) {
   if (!exec.generateMsg) {
     if (exec.from === undefined) {
@@ -101,17 +101,16 @@ export async function handleExecCommand(
 
   const mirror = getMirrorClient(exec.from, exec.home);
   const wallet = mirror.lcd.wallet(mirror.key);
-  const msgs = [createMsg(mirror)];
+  const msg = await createMsg(mirror);
+  const msgs = [msg];
 
   if (exec.generateMsg) {
     if (exec.base64) {
       return console.log(
-        Buffer.from(JSON.stringify(createMsg(mirror).execute_msg)).toString(
-          'base64'
-        )
+        Buffer.from(JSON.stringify(msg.execute_msg)).toString('base64')
       );
     }
-    return console.log(JSON.stringify(createMsg(mirror).execute_msg));
+    return console.log(JSON.stringify(msg.execute_msg));
   }
 
   const chainId: string = exec.chainId

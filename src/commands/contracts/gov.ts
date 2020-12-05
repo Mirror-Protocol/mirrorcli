@@ -21,8 +21,8 @@ const updateConfig = exec
   .option('--quorum <dec>', 'New quorum %')
   .option('--threshold <dec>', 'New threshold %')
   .option('--voting-period <int>', 'New voting period (sec)')
-  .action(() => {
-    handleExecCommand(exec, mirror =>
+  .action(async () => {
+    await handleExecCommand(exec, async mirror =>
       mirror.gov.updateConfig({
         owner: Parse.accAddress(updateConfig.owner),
         effective_delay: Parse.int(updateConfig.effectiveDelay),
@@ -48,13 +48,13 @@ const castVote = exec
     'vote-option': `(string) 'yes' or 'no'`,
     amount: '(Uint128) amount of staked MIR voting power to allocate',
   })
-  .action((pollId: string, voteOption: string, amount: string) => {
+  .action(async (pollId: string, voteOption: string, amount: string) => {
     if (voteOption !== 'yes' && voteOption !== 'no') {
       throw new Error(
         `invalid vote option '${voteOption}', MUST be 'yes' or 'no'`
       );
     }
-    handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       mirror.gov.castVote(Parse.int(pollId), voteOption, Parse.uint128(amount))
     );
   });
@@ -71,7 +71,7 @@ const createPoll = exec
     'contract to execute on (specify message with --execute-msg)'
   )
   .option('--execute-msg <json>', 'message to execute')
-  .action(() => {
+  .action(async () => {
     let executeMsg: MirrorGov.ExecuteMsg;
 
     if (createPoll.executeTo || createPoll.executeMsg) {
@@ -89,7 +89,7 @@ const createPoll = exec
       };
     }
 
-    handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       mirror.gov.createPoll(
         mirror.mirrorToken,
         Parse.uint128(createPoll.deposit),
@@ -106,8 +106,8 @@ const executePoll = exec
   .description(`Executes the poll`, {
     pollId: '(int) poll id',
   })
-  .action((pollId: string) => {
-    handleExecCommand(exec, mirror =>
+  .action(async (pollId: string) => {
+    await handleExecCommand(exec, async mirror =>
       mirror.gov.executePoll(Parse.int(pollId))
     );
   });
@@ -117,8 +117,10 @@ const endPoll = exec
   .description(`Ends a poll`, {
     pollId: '(int) poll id',
   })
-  .action((pollId: string) => {
-    handleExecCommand(exec, mirror => mirror.gov.endPoll(Parse.int(pollId)));
+  .action(async (pollId: string) => {
+    await handleExecCommand(exec, async mirror =>
+      mirror.gov.endPoll(Parse.int(pollId))
+    );
   });
 
 const expirePoll = exec
@@ -126,8 +128,10 @@ const expirePoll = exec
   .description(`Expires a poll`, {
     pollId: '(int) poll id',
   })
-  .action((pollId: string) => {
-    handleExecCommand(exec, mirror => mirror.gov.expirePoll(Parse.int(pollId)));
+  .action(async (pollId: string) => {
+    await handleExecCommand(exec, async mirror =>
+      mirror.gov.expirePoll(Parse.int(pollId))
+    );
   });
 
 const stake = exec
@@ -135,8 +139,8 @@ const stake = exec
   .description(`Stake MIR tokens in governance`, {
     amount: '(Uint128) amount of MIR tokens to stake',
   })
-  .action((amount: string) => {
-    handleExecCommand(exec, mirror =>
+  .action(async (amount: string) => {
+    await handleExecCommand(exec, async mirror =>
       mirror.gov.stakeVotingTokens(mirror.mirrorToken, Parse.uint128(amount))
     );
   });
@@ -146,8 +150,8 @@ const unstake = exec
   .description(`Unstake MIR tokens in governance`, {
     amount: '(Uint128) amount of MIR tokens to unstake',
   })
-  .action((amount: string) => {
-    handleExecCommand(exec, mirror =>
+  .action(async (amount: string) => {
+    await handleExecCommand(exec, async mirror =>
       mirror.gov.withdrawVotingTokens(Parse.uint128(amount))
     );
   });
@@ -156,15 +160,17 @@ const query = createQueryMenu('gov', 'Mirror Gov contract queries');
 const getConfig = query
   .command('config')
   .description('Query Mirror Gov contract config')
-  .action(() => {
-    handleQueryCommand(query, mirror => mirror.gov.getConfig());
+  .action(async () => {
+    await handleQueryCommand(query, async mirror => mirror.gov.getConfig());
   });
 
 const getPoll = query
   .command('poll <poll-id>')
   .description('Query poll')
-  .action((pollId: string) => {
-    handleQueryCommand(query, mirror => mirror.gov.getPoll(Parse.int(pollId)));
+  .action(async (pollId: string) => {
+    await handleQueryCommand(query, async mirror =>
+      mirror.gov.getPoll(Parse.int(pollId))
+    );
   });
 
 const getPolls = query
@@ -176,8 +182,8 @@ const getPolls = query
   )
   .option('--start-after <int>', 'poll ID to start query from')
   .option('--limit <int>', 'max results to return')
-  .action(() => {
-    handleQueryCommand(query, mirror => {
+  .action(async () => {
+    await handleQueryCommand(query, async mirror => {
       if (
         getPolls.filter &&
         !['in_progress', 'passed', 'rejected', 'executed'].includes(
@@ -201,8 +207,8 @@ const getStaker = query
   .description('Query MIR staker', {
     staker: '(AccAddress) staker address to query',
   })
-  .action((address: string) => {
-    handleQueryCommand(query, mirror =>
+  .action(async (address: string) => {
+    await handleQueryCommand(query, async mirror =>
       mirror.gov.getStaker(Parse.accAddress(address))
     );
   });
@@ -210,8 +216,8 @@ const getStaker = query
 const getState = query
   .command('state')
   .description('Query Mirror Gov state')
-  .action(() => {
-    handleQueryCommand(query, mirror => mirror.gov.getState());
+  .action(async () => {
+    await handleQueryCommand(query, async mirror => mirror.gov.getState());
   });
 
 const getVoters = query
@@ -219,8 +225,8 @@ const getVoters = query
   .description('Query voter for a poll')
   .option('--start-after <string>', 'voter prefix to start query from')
   .option('--limit <int>', 'max results to return')
-  .action((pollId: string) => {
-    handleQueryCommand(query, mirror =>
+  .action(async (pollId: string) => {
+    await handleQueryCommand(query, async mirror =>
       mirror.gov.getVoters(
         Parse.int(pollId),
         getVoters.startAfter,

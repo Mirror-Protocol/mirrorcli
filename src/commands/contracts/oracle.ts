@@ -13,7 +13,7 @@ const updateConfig = exec
   .description(`Update Mint Oracle contract config`)
   .option('--owner <string>', 'New owner address')
   .action(async () => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       mirror.oracle.updateConfig({
         owner: Parse.accAddress(updateConfig.owner),
       })
@@ -27,7 +27,7 @@ const registerAsset = exec
     feeder: '(AccAddress) oracle feeder',
   })
   .action(async (assetToken: string, feeder: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       mirror.oracle.registerAsset(
         Parse.assetTokenOrAccAddress(assetToken),
         Parse.accAddress(feeder)
@@ -43,7 +43,9 @@ const feedPrice = exec
   .action(async (...args: any[]) => {
     args = args[1].args;
     const prices = Parse.prices(args);
-    await handleExecCommand(exec, mirror => mirror.oracle.feedPrice(prices));
+    await handleExecCommand(exec, async mirror =>
+      mirror.oracle.feedPrice(prices)
+    );
   });
 
 const query = createQueryMenu('oracle', 'Mirror Oracle contract queries');
@@ -51,7 +53,7 @@ const getConfig = query
   .command('config')
   .description('Query Mirror Oracle contract config')
   .action(async () => {
-    await handleQueryCommand(query, mirror => mirror.oracle.getConfig());
+    await handleQueryCommand(query, async mirror => mirror.oracle.getConfig());
   });
 
 const getFeeder = query
@@ -60,7 +62,7 @@ const getFeeder = query
     'asset-token': '(symbol / AccAddress) asset to get feeder for',
   })
   .action(async (assetToken: string) => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       mirror.oracle.getFeeder(Parse.assetTokenOrAccAddress(assetToken))
     );
   });
@@ -76,12 +78,12 @@ const getPrice = query
     if (quoteAsset !== 'uusd') {
       quoteAsset = Parse.assetTokenOrAccAddress(quoteAsset);
     }
-    await handleQueryCommand(query, mirror => {
-      return mirror.oracle.getPrice(
+    await handleQueryCommand(query, async mirror =>
+      mirror.oracle.getPrice(
         Parse.assetTokenOrAccAddress(baseAsset),
         quoteAsset
-      );
-    });
+      )
+    );
   });
 
 const getPrices = query
@@ -90,12 +92,9 @@ const getPrices = query
   .option('--start-after <string>', 'index of to start query')
   .option('--limit <int>', 'max number of results to receive')
   .action(async () => {
-    await handleQueryCommand(query, mirror => {
-      return mirror.oracle.getPrices(
-        getPrices.startAfter,
-        Parse.int(getPrices.limit)
-      );
-    });
+    await handleQueryCommand(query, async mirror =>
+      mirror.oracle.getPrices(getPrices.startAfter, Parse.int(getPrices.limit))
+    );
   });
 
 export default {

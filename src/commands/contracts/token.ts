@@ -40,7 +40,7 @@ const transfer = exec
     asset: '(Asset) amount of asset to send',
   })
   .action(async (recipient: string, asset: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).transfer(
         recipient,
         Parse.asset(asset).amount
@@ -56,7 +56,7 @@ const transferFrom = exec
     asset: '(Asset) amount of asset to send',
   })
   .action(async (owner: string, recipient: string, asset: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).transferFrom(
         Parse.accAddress(owner),
         Parse.accAddress(recipient),
@@ -76,7 +76,7 @@ const send = exec
   )
   .option('--msg <json>', 'string of JSON Receive hook to run')
   .action(async (contract: string, asset: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).send(
         Parse.accAddress(contract),
         Parse.asset(asset).amount,
@@ -99,7 +99,7 @@ const sendFrom = exec
   )
   .option('--msg <json>', 'string of JSON Receive hook to run')
   .action(async (owner: string, contract: string, asset: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).sendFrom(
         Parse.accAddress(owner),
         Parse.accAddress(contract),
@@ -120,7 +120,7 @@ const mint = exec
     asset: '(Asset) amount of asset to mint and send',
   })
   .action(async (recipient: string, asset: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).mint(
         Parse.accAddress(recipient),
         Parse.asset(asset).amount
@@ -134,7 +134,7 @@ const burn = exec
     asset: '(Asset) amount of asset to burn',
   })
   .action(async (asset: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).burn(Parse.asset(asset).amount)
     );
   });
@@ -146,7 +146,7 @@ const burnFrom = exec
     asset: '(Asset) amount of asset to burn',
   })
   .action(async (owner: string, asset: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).burnFrom(
         Parse.accAddress(owner),
         Parse.asset(asset).amount
@@ -195,7 +195,7 @@ const increaseAllowance = exec
       };
     }
 
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).increaseAllowance(
         Parse.accAddress(spender),
         Parse.asset(asset).amount,
@@ -244,7 +244,7 @@ const decreaseAllowance = exec
       };
     }
 
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       lookupTokenByAsset(mirror, asset).decreaseAllowance(
         Parse.accAddress(spender),
         Parse.asset(asset).amount,
@@ -260,7 +260,7 @@ const getTokenInfo = query
     symbol: '(symbol / AccAddress): token symbol or account address',
   })
   .action(async (symbol: string) => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       lookupTokenByAssetTokenOrAccAddress(mirror, symbol).getTokenInfo()
     );
   });
@@ -271,7 +271,7 @@ const getMinter = query
     symbol: '(symbol / AccAddress): token symbol or account address',
   })
   .action(async (symbol: string) => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       lookupTokenByAssetTokenOrAccAddress(mirror, symbol).getMinter()
     );
   });
@@ -283,7 +283,7 @@ const getBalance = query
     address: '(AccAddress) address to query',
   })
   .action(async (symbol: string, address?: string) => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       lookupTokenByAssetTokenOrAccAddress(mirror, symbol).getBalance(address)
     );
   });
@@ -296,7 +296,7 @@ const getAllowance = query
     spender: '(AccAddress) spender address',
   })
   .action(async (symbol: string, owner: string, spender: string) => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       lookupTokenByAssetTokenOrAccAddress(mirror, symbol).getAllowance(
         Parse.accAddress(owner),
         Parse.accAddress(spender)
@@ -313,7 +313,7 @@ const getAllAllowances = query
   .option('--start-after <string>', 'index of to start query')
   .option('--limit <int>', 'max number of results to receive')
   .action(async (symbol: string, owner: string) => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       lookupTokenByAssetTokenOrAccAddress(mirror, symbol).getAllAllowances(
         Parse.accAddress(owner),
         getAllAllowances.startAfter,
@@ -330,7 +330,7 @@ const getAllAccounts = query
   .option('--start-after <string>', 'prefix to start query')
   .option('--limit <int>', 'max number of results to receive')
   .action(async (symbol: string) => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       lookupTokenByAssetTokenOrAccAddress(mirror, symbol).getAllAccounts(
         getAllAccounts.startAfter,
         Parse.int(getAllAccounts.limit)
