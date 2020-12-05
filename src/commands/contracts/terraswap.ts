@@ -192,6 +192,19 @@ const getPairs = query
     });
   });
 
+const getPool = query
+  .command('pool <asset1> <asset2>')
+  .description('Get pool information on pair', {
+    asset1: '(symbol / uusd) native coin or CW20 address',
+    asset2: '(symbol / uusd) native coin or CW20 address',
+  })
+  .action(async (asset1: string, asset2: string) => {
+    await handleQueryCommand(query, async mirror => {
+      const pair = lookupPair(mirror, asset1, asset2);
+      return pair.getPool();
+    });
+  });
+
 const getSimulateSwap = query
   .command('simulate-swap <from-asset> <to-asset>')
   .description('Simulate and determine swap price', {
