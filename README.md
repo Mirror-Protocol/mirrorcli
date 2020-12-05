@@ -3,21 +3,21 @@
 Command-line interface for Mirror Protocol on Terra.
 
 ## Table of Contents <!-- omit in toc -->
-
 - [Installation](#installation)
 - [Configuration](#configuration)
   - [Specifying LCD settings](#specifying-lcd-settings)
   - [Specifying Contracts](#specifying-contracts)
-  - [Specifying the Assets](#specifying-the-assets)
   - [Specify the Network [IMPORTANT]](#specify-the-network-important)
+    - [Example](#example)
 - [Usage](#usage)
   - [Execute](#execute)
   - [Query](#query)
 - [Examples](#examples)
-  - [Partial withdrawal of collateral from CDP](#partial-withdrawal-of-collateral-from-cdp)
+  - [Adjusting CDP collateral ratio via mint / burn](#adjusting-cdp-collateral-ratio-via-mint--burn)
+    - [Minting](#minting)
+    - [Burning](#burning)
   - [Creating a new poll](#creating-a-new-poll)
 - [License](#license)
-
 ## Installation
 
 **Requirements**
@@ -114,10 +114,6 @@ Each network configuration should point to the correct Mirror core contract addr
 }
 ```
 
-### Specifying the Assets
-
-`mirrorcli` takes
-
 ### Specify the Network [IMPORTANT]
 
 By default, `mirrorcli` will use the network setting for `columbus-4` configured in `~/.mirrorclirc.json`. You can direct `mirrorcli` to use a different network configuration by changing the value of the `MIRRORCLI_NETWORK` environment variable.
@@ -176,6 +172,7 @@ Commands:
   mint [options]          Mirror Mint contract functions
   oracle [options]        Mirror Oracle contract functions
   staking [options]       Mirror Staking contract functions
+  airdrop [options]       Mirror Airdrop contract functions [mainnet only]
   terraswap|ts [options]  Terraswap contract functions
   token [options]         Terraswap CW20 Token contract functions
   help [command]          display help for command
@@ -199,6 +196,7 @@ Commands:
   mint [options]          Mirror Mint contract queries
   oracle [options]        Mirror Oracle contract queries
   staking [options]       Mirror Staking contract queries
+  airdrop [options]       Mirror Airdrop contract queries [mainnet only]
   terraswap|ts [options]  Terraswap contract queries
   token [options]         Terraswap CW20 Token contract queries
   help [command]          display help for command
