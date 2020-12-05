@@ -19,6 +19,10 @@ const claim = exec
     amount:
       '(Uint128) amount of MIR tokens to claim. If omitted, total amount will be fetched via Mirror API to claim all.',
   })
+  .option(
+    '--for-account <account>',
+    `(AccAddress) - account address to claim for (if not provided, will use the specified key's account)`
+  )
   .action(async (stage: string, amount?: string) => {
     await handleExecCommand(exec, async mirror => {
       let proof: string[];
@@ -27,7 +31,9 @@ const claim = exec
         gql`
           query {
             airdrop(
-              address: "${mirror.key.accAddress}"
+              address: "${
+                Parse.accAddress(claim.forAccount) || mirror.key.accAddress
+              }"
               network: "TERRA"
             )
           }
