@@ -27,7 +27,7 @@ const claim = exec
         gql`
           query {
             airdrop(
-              address: "terra1v6ffte3t96hcqpyx5nqwp38k6cvvjz66fwkp9x"
+              address: "${mirror.key.accAddress}"
               network: "TERRA"
             )
           }
