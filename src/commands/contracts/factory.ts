@@ -9,7 +9,7 @@ import {
 const exec = createExecMenu('factory', 'Mirror Factory contract functions');
 
 const distribute = exec.command('distribute').action(() => {
-  handleExecCommand(exec, mirror => mirror.factory.distribute());
+  handleExecCommand(exec, async mirror => mirror.factory.distribute());
 });
 
 const updateConfig = exec
@@ -19,7 +19,7 @@ const updateConfig = exec
   .option('--token-code-id <int>', 'New CW20 token code ID')
   .option('--distribution-schedule <json>', 'New distribution schedule')
   .action(() => {
-    handleExecCommand(exec, mirror =>
+    handleExecCommand(exec, async mirror =>
       mirror.factory.updateConfig({
         owner: Parse.accAddress(updateConfig.owner),
         token_code_id: updateConfig.tokenCodeId,
@@ -43,8 +43,8 @@ const postInitialize = exec
     '*Mirror Collector contract address'
   )
   .action(() => {
-    handleExecCommand(exec, mirror => {
-      return mirror.factory.postInitialize(
+    handleExecCommand(exec, async mirror =>
+      mirror.factory.postInitialize(
         Parse.accAddress(postInitialize.owner),
         Parse.accAddress(postInitialize.terraswap),
         Parse.accAddress(postInitialize.mirToken),
@@ -52,8 +52,8 @@ const postInitialize = exec
         Parse.accAddress(postInitialize.oracle),
         Parse.accAddress(postInitialize.mint),
         Parse.accAddress(postInitialize.collector)
-      );
-    });
+      )
+    );
   });
 
 const whitelist = exec
@@ -71,7 +71,7 @@ const whitelist = exec
   )
   .requiredOption('--min-col-ratio <Dec>', '*min. collateral ratio of mAsset')
   .action(() => {
-    handleExecCommand(exec, mirror =>
+    handleExecCommand(exec, async mirror =>
       mirror.factory.whitelist(
         whitelist.assetName,
         whitelist.symbol,
@@ -90,7 +90,7 @@ const terraswapCreationHook = exec
     'mir-token': '(symbol / AccAddress) MIR Token address',
   })
   .action((mirToken: string) => {
-    handleExecCommand(exec, mirror =>
+    handleExecCommand(exec, async mirror =>
       mirror.factory.terraswapCreationHook(
         Parse.assetTokenOrAccAddress(mirToken)
       )
@@ -108,7 +108,7 @@ const migrateAsset = exec
   .requiredOption('--from-token <symbol / AccAddress>', '*token address')
   .requiredOption('--end-price <Dec>', '*end price for asset')
   .action(() => {
-    handleExecCommand(exec, mirror =>
+    handleExecCommand(exec, async mirror =>
       mirror.factory.migrateAsset(
         migrateAsset.assetName,
         migrateAsset.symbol,
@@ -125,12 +125,12 @@ const passCommand = exec
   })
   .requiredOption('--msg <json>', 'message to execute')
   .action((contractAddress: string) => {
-    handleExecCommand(exec, mirror => {
-      return mirror.factory.passCommand(
+    handleExecCommand(exec, async mirror =>
+      mirror.factory.passCommand(
         Parse.accAddress(contractAddress),
         JSON.parse(passCommand.msg)
-      );
-    });
+      )
+    );
   });
 
 const query = createQueryMenu('factory', 'Mirror Factory contract queries');
@@ -138,14 +138,14 @@ const getConfig = query
   .command('config')
   .description('Query Mirror Factory contract config')
   .action(async () => {
-    await handleQueryCommand(query, mirror => mirror.factory.getConfig());
+    await handleQueryCommand(query, async mirror => mirror.factory.getConfig());
   });
 
 const getDistributionInfo = query
   .command('distribution-info')
   .description('Query Mirror Factory distribution info')
   .action(async () => {
-    await handleQueryCommand(query, mirror =>
+    await handleQueryCommand(query, async mirror =>
       mirror.factory.getDistributionInfo()
     );
   });

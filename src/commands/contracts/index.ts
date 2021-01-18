@@ -6,6 +6,7 @@ import Gov from './gov';
 import Mint from './mint';
 import Oracle from './oracle';
 import Staking from './staking';
+import Airdrop from './airdrop';
 
 // Terraswap contracts
 import TerraswapFactory from './terraswap';
@@ -19,6 +20,7 @@ export const mirror = [
   Mint,
   Oracle,
   Staking,
+  Airdrop,
 ];
 
 export const terraswap = [TerraswapFactory, TerraswapToken];

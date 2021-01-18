@@ -122,6 +122,10 @@ export namespace Parse {
     }
   }
 
+  /**
+   * Parses `AssetInfo` from token acc address, symbol name (MIR, mAAPL), or native denom (uusd)
+   * @param input
+   */
   export function assetInfo(input?: string): AssetInfo {
     if (input === undefined) {
       return undefined;

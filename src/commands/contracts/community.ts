@@ -14,7 +14,7 @@ const updateConfig = exec
   .option('--owner <AccAddress>', 'new owner')
   .option('--spend-limit <Uint128>', 'new MIR spend limit')
   .action(async () => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       mirror.community.updateConfig({
         owner: Parse.accAddress(updateConfig.owner),
         spend_limit: updateConfig.spendLimit
@@ -31,7 +31,7 @@ const spend = exec
     amount: '(Uint128) amount of MIR tokens to send',
   })
   .action(async (recipient: string, amount: string) => {
-    await handleExecCommand(exec, mirror =>
+    await handleExecCommand(exec, async mirror =>
       mirror.community.spend(Parse.accAddress(recipient), Parse.uint128(amount))
     );
   });
@@ -41,7 +41,9 @@ const getConfig = query
   .command('config')
   .description('Query Mirror Community contract config')
   .action(async () => {
-    await handleQueryCommand(query, mirror => mirror.community.getConfig());
+    await handleQueryCommand(query, async mirror =>
+      mirror.community.getConfig()
+    );
   });
 
 export default {
