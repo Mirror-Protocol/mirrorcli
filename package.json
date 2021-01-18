@@ -1,6 +1,6 @@
 {
   "name": "@mirror-protocol/mirrorcli",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "Command-line interface for Mirror Protocol",
   "main": "dist/bundle.node.js",
   "typings": "dist/index.d.ts",
@@ -72,7 +72,6 @@
     "dot-prop": "^6.0.1",
     "graphql": "^15.4.0",
     "graphql-request": "^3.3.0",
-    "jsome": "^2.5.0",
     "jsonschema": "^1.4.0",
     "lodash": "^4.17.20",
     "prettycli": "^1.4.3",

@@ -1,6 +1,5 @@
 import * as commander from 'commander';
 import * as _ from 'lodash';
-const jsome = require('jsome');
 const yesno = require('yesno');
 import * as yaml from 'yaml';
 
@@ -183,7 +182,7 @@ export async function handleExecCommand(
     if (exec.yaml) {
       console.log(yaml.stringify(unsignedTx.toStdTx().toData()));
     } else {
-      jsome(unsignedTx.toStdTx().toData());
+      console.log(unsignedTx.toStdTx().toData());
     }
   } else {
     if (!exec.yes) {
@@ -230,7 +229,7 @@ export async function handleExecCommand(
     if (exec.yaml) {
       console.log(yaml.stringify(result));
     } else {
-      jsome(result);
+      console.log(result);
     }
   }
 }
@@ -243,6 +242,6 @@ export async function handleQueryCommand(
   if (query.yaml) {
     console.log(yaml.stringify(result));
   } else {
-    jsome(result);
+    console.log(result);
   }
 }
