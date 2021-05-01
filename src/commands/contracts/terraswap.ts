@@ -103,9 +103,7 @@ const swap = exec
         belief_price: Parse.dec(swap.beliefPrice),
         max_spread: Parse.dec(swap.maxSpread),
         to: Parse.accAddress(swap.sendTo),
-        offer_token: offer.denom.startsWith('u')
-          ? undefined
-          : lookupTokenByAsset(mirror, fromAsset),
+        offer_token: offer.denom,
       });
     });
   });
